@@ -1,47 +1,62 @@
-const fs = require('fs');
-const path = require('path');
+const fs = require('node:fs');
+const path = require('node:path');
 
-const categories = ['rrugë/gropa', 'ndriçim', 'mbeturina', 'sinjalistikë'];
-const statuses = ['dorëzuar', 'në verifikim', 'caktuar', 'në proces', 'zgjidhur', 'refuzuar', 'rihapur'];
+const reportCount = 120;
+const generationSeed = 20260723;
+const referenceDate = Date.UTC(2026, 6, 1);
 
-// Bounding box for a generic city center (e.g. Pristina approx coords)
-const minLat = 42.64;
-const maxLat = 42.68;
-const minLng = 21.14;
-const maxLng = 21.18;
+// This is an explicitly synthetic demo grid, not an address, municipality, or real incident location.
+const syntheticMapCenter = { latitude: 42.0, longitude: 20.0 };
 
-const getRandomItem = (arr) => arr[Math.floor(Math.random() * arr.length)];
-const getRandomInRange = (min, max) => Math.random() * (max - min) + min;
+const categories = [
+  { slug: 'rruge-gropa', name: 'Rrugë dhe gropa', slaHours: 48, subjects: ['Gropë në segment rrugor', 'Trotuar i dëmtuar', 'Asfalt i dëmtuar'] },
+  { slug: 'ndricim-publik', name: 'Ndriçim publik', slaHours: 24, subjects: ['Ndriçim publik i fikur', 'Shtyllë ndriçimi e dëmtuar', 'Zonë publike pa ndriçim'] },
+  { slug: 'mbeturina', name: 'Mbeturina', slaHours: 24, subjects: ['Kontejner i mbushur', 'Mbeturina në hapësirë publike', 'Nevojë për pastrim'] },
+  { slug: 'sinjalistike', name: 'Sinjalistikë', slaHours: 72, subjects: ['Shenjë trafiku e dëmtuar', 'Vijëzim i zbehur', 'Sinjalistikë që mungon'] },
+];
 
-const dataset = [];
+const statuses = ['submitted', 'under_review', 'assigned', 'in_progress', 'resolved', 'rejected', 'reopened'];
 
-for (let i = 1; i <= 100; i++) {
-  const category = getRandomItem(categories);
-  const status = getRandomItem(statuses);
-  const lat = getRandomInRange(minLat, maxLat);
-  const lng = getRandomInRange(minLng, maxLng);
-  const date = new Date(Date.now() - Math.floor(Math.random() * 10000000000));
+function seededRandom(seed) {
+  let state = seed >>> 0;
+  return () => {
+    state = (state * 1664525 + 1013904223) >>> 0;
+    return state / 4294967296;
+  };
+}
 
-  dataset.push({
-    id: `REQ-${1000 + i}`,
-    title: `Problem me ${category} - Rasti ${i}`,
-    description: `Ky është një përshkrim sintetik për problemin e raportuar në kategorinë ${category}. Lokacioni është përafërsisht në qendër.`,
-    category,
-    location: {
-      latitude: lat,
-      longitude: lng
-    },
+const random = seededRandom(generationSeed);
+const choose = (items) => items[Math.floor(random() * items.length)];
+const between = (minimum, maximum) => minimum + random() * (maximum - minimum);
+const round = (value, decimals) => Number(value.toFixed(decimals));
+
+const dataset = Array.from({ length: reportCount }, (_, index) => {
+  const category = choose(categories);
+  const status = choose(statuses);
+  const createdAt = new Date(Date.UTC(2026, 0, 1) + Math.floor(random() * 155 * 24 * 60 * 60 * 1000));
+  const updatedAt = new Date(createdAt.getTime() + Math.floor(random() * 72 * 60 * 60 * 1000));
+  const slaDueAt = new Date(createdAt.getTime() + category.slaHours * 60 * 60 * 1000);
+  const isTerminal = status === 'resolved' || status === 'rejected';
+
+  return {
+    id: `SYN-${String(index + 1).padStart(4, '0')}`,
+    report_number: 1001 + index,
+    title: `${choose(category.subjects)} — rast sintetik ${index + 1}`,
+    description: `Përshkrim sintetik për kategorinë ${category.name.toLowerCase()}. Nuk përfaqëson problem, person ose adresë reale.`,
+    category_slug: category.slug,
+    category_name: category.name,
     status,
-    reportedAt: date.toISOString(),
-    updatedAt: new Date(date.getTime() + Math.floor(Math.random() * 86400000)).toISOString(),
-    photoUrl: null // No real photos to protect privacy
-  });
-}
+    latitude: round(between(syntheticMapCenter.latitude - 0.025, syntheticMapCenter.latitude + 0.025), 4),
+    longitude: round(between(syntheticMapCenter.longitude - 0.025, syntheticMapCenter.longitude + 0.025), 4),
+    public_location_precision_m: 500,
+    created_at: createdAt.toISOString(),
+    updated_at: updatedAt.toISOString(),
+    sla_due_at: slaDueAt.toISOString(),
+    is_sla_overdue: !isTerminal && slaDueAt.getTime() < referenceDate,
+    is_public: status !== 'submitted',
+  };
+});
 
-const dir = path.join(__dirname, 'dataset');
-if (!fs.existsSync(dir)){
-    fs.mkdirSync(dir);
-}
-
-fs.writeFileSync(path.join(dir, 'synthetic_dataset.json'), JSON.stringify(dataset, null, 2));
-console.log('Dataset with 100 items generated successfully.');
+const datasetPath = path.join(__dirname, 'dataset', 'synthetic_dataset.json');
+fs.writeFileSync(datasetPath, `${JSON.stringify(dataset, null, 2)}\n`, 'utf8');
+console.log(`Generated ${reportCount} deterministic synthetic reports.`);

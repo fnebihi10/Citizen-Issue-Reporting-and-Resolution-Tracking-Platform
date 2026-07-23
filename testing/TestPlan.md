@@ -16,7 +16,7 @@ Ky plan testimi përshkruan qasjen për të vlerësuar funksionalitetin dhe sigu
 3. **Ngarkimi i Fotografisë**: Verifiko që fotografia pranohet dhe konvertohet/ruhet pa zbuluar identitetin.
 4. **Validimi i Lokacionit**: Raportet nuk mund të dërgohen pa lokacion në hartë.
 5. **Sugjerimi i Raportimeve**: Testo sugjerimin e raporteve ekzistuese bazuar në distancë, kategori dhe kohë.
-6. **Tranzicioni i Statuseve**: Verifiko kalimin: `dorëzuar` -> `në verifikim` -> `caktuar` -> `në proces` -> `zgjidhur` / `refuzuar` / `rihapur`.
+6. **Tranzicioni i Statuseve**: Verifiko kalimin: `submitted` -> `under_review` -> `assigned` -> `in_progress` -> `resolved`; kontrollo edhe `rejected` dhe `reopened` sipas rregullave të databazës.
 7. **Filtrat**: Testo filtrimin e problemeve në panel sipas statusit dhe kategorisë.
 8. **Eksporti CSV/JSON**: Administratori mund të shkarkojë raportet valide.
 9. **Komentet**: Zyrtari mund të lë komente në ticket gjatë trajtimit.
@@ -32,7 +32,7 @@ Ky plan testimi përshkruan qasjen për të vlerësuar funksionalitetin dhe sigu
 17. **Kërkime Boshe (Empty Search)**: Kontrollo vizualizimin e hartës dhe listës kur nuk ka asnjë raport.
 
 ### 3. Testet e Sigurisë (Security Testing)
-18. **Autorizimi i Roleve**: Një "Vizitor Publik" nuk mund të qaset në `/admin` ose `/dashboard` zyrtar.
+18. **Autorizimi i Roleve**: Një "Vizitor Publik" nuk mund të qaset në `/account`, `/official` ose `/admin`.
 19. **Privatësia në Hartë**: Vizitori publik nuk mund të gjejë asnjë gjurmë të IP-së apo emailit të qytetarit në request-et e hartës (API).
 20. **Rate Limiting**: Blloko thirrjet abuzive për krijimin e raporteve (p.sh., 10 raporte nga i njëjti IP brenda 1 minute).
 21. **XSS Protection**: Fusha e përshkrimit nuk duhet të ekzekutojë skripte nëse shtohet kod `<script>alert(1)</script>`.
@@ -47,5 +47,5 @@ Ky plan testimi përshkruan qasjen për të vlerësuar funksionalitetin dhe sigu
 - Matja e kohës së përfundimit, gabimeve dhe përshtypjes së përgjithshme.
 
 ## Mjedisi dhe Mjetet e Testimit
-- **Dataset**: `dataset/synthetic_dataset.json` me >100 raporte testuese.
-- **Frameworks**: Jest, Cypress, Postman, dhe testime manuale vizuale.
+- **Dataset**: `dataset/synthetic_dataset.json` me 120 raporte deterministike.
+- **Mjetet e planifikuara**: Playwright/Vitest për testet e automatizuara, Supabase SQL Editor për RLS dhe testime manuale vizuale. Nuk deklarojmë asnjë test si të kaluar para ekzekutimit të tij.
