@@ -16,7 +16,7 @@ export default async function CitizenReportPage() {
   if (!user) redirect('/login?next=/citizen/report');
 
   const { data, error } = await supabase.from('categories').select('*').eq('is_active', true).order('name');
-  const categories = (data ?? []) as Category[];
+  const categories: Category[] = data ?? [];
 
   return (
     <div className="min-h-screen">

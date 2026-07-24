@@ -2,13 +2,15 @@
 
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import { AlertTriangle, FileImage, FileText, Info, MapPin, Send, ShieldCheck, UploadCloud, X } from 'lucide-react';
-import { useRef, useState, type FormEvent } from 'react';
+import { AlertTriangle, FileImage, FileText, Info, LoaderCircle, MapPin, SearchCheck, Send, ShieldCheck, UploadCloud, X } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
+import { ReportStatusBadge } from '@/components/reports/ReportStatusBadge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import type { Category } from '@/types/database';
+import type { Category, SimilarReportSuggestion } from '@/types/database';
 import { createClient } from '@/lib/supabase/client';
+import { stripImageMetadata } from '@/lib/reports/stripExif';
 import { validateCitizenReport, validateReportImage } from '@/lib/reports/validation';
 import { createCitizenReport } from '@/app/(workspace)/citizen/report/actions';
 import type { ReportCoordinates } from './LocationPicker';
@@ -18,13 +20,15 @@ const LocationPicker = dynamic(() => import('./LocationPicker').then((module) =>
   loading: () => <div className="flex h-[300px] items-center justify-center rounded-2xl border border-slate-200 bg-slate-100 text-sm font-semibold text-slate-500 sm:h-[360px]">Duke përgatitur hartën...</div>,
 });
 
-function sanitizeFileName(fileName: string) {
-  const safeName = fileName.toLowerCase().replace(/[^a-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '');
-  return safeName.slice(-80) || 'evidence';
+function imageExtension(mimeType: string) {
+  if (mimeType === 'image/png') return 'png';
+  if (mimeType === 'image/webp') return 'webp';
+  return 'jpg';
 }
 
 export function ReportForm({ categories }: { categories: Category[] }) {
   const router = useRouter();
+  const supabase = useMemo(() => createClient(), []);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -36,15 +40,89 @@ export function ReportForm({ categories }: { categories: Category[] }) {
   const [warning, setWarning] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [sanitizingImage, setSanitizingImage] = useState(false);
+  const [similarLookup, setSimilarLookup] = useState<{
+    key: string;
+    reports: SimilarReportSuggestion[];
+    error: string | null;
+    loading: boolean;
+  }>({ key: '', reports: [], error: null, loading: false });
+  const similarLookupKey = categoryId && coordinates
+    ? `${categoryId}:${coordinates.latitude}:${coordinates.longitude}`
+    : '';
+  const similarReports = similarLookup.key === similarLookupKey
+    ? similarLookup.reports
+    : [];
+  const similarReportsError = similarLookup.key === similarLookupKey
+    ? similarLookup.error
+    : null;
+  const similarReportsLoading = Boolean(similarLookupKey)
+    && (
+      similarLookup.key !== similarLookupKey
+      || similarLookup.loading
+    );
 
-  function handleFileChange(nextFile: File | null) {
+  useEffect(() => {
+    let cancelled = false;
+
+    if (!categoryId || !coordinates || !similarLookupKey) return;
+
+    const timeoutId = window.setTimeout(async () => {
+      if (cancelled) return;
+      setSimilarLookup({
+        key: similarLookupKey,
+        reports: [],
+        error: null,
+        loading: true,
+      });
+
+      const { data, error: suggestionsError } = await supabase.rpc(
+        'suggest_similar_reports',
+        {
+          p_category_id: categoryId,
+          p_latitude: coordinates.latitude,
+          p_longitude: coordinates.longitude,
+          p_radius_m: 500,
+        },
+      );
+
+      if (cancelled) return;
+
+      if (suggestionsError) {
+        console.error('Similar report lookup failed', suggestionsError);
+        setSimilarLookup({
+          key: similarLookupKey,
+          reports: [],
+          error: 'Sugjerimet nuk mund të kontrollohen tani. Mund ta dorëzosh raportimin normalisht.',
+          loading: false,
+        });
+        return;
+      }
+
+      setSimilarLookup({
+        key: similarLookupKey,
+        reports: data ?? [],
+        error: null,
+        loading: false,
+      });
+    }, 450);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timeoutId);
+    };
+  }, [categoryId, coordinates, similarLookupKey, supabase]);
+
+  async function handleFileChange(nextFile: File | null) {
     setError(null);
     setWarning(null);
     setNotice(null);
     if (!nextFile) {
       setFile(null);
+      if (fileInputRef.current) fileInputRef.current.value = '';
       return;
     }
+
     const fileError = validateReportImage(nextFile);
     if (fileError) {
       setFile(null);
@@ -52,7 +130,20 @@ export function ReportForm({ categories }: { categories: Category[] }) {
       setError(fileError);
       return;
     }
-    setFile(nextFile);
+
+    setSanitizingImage(true);
+    setFile(null);
+    try {
+      const sanitizedFile = await stripImageMetadata(nextFile);
+      const sanitizedFileError = validateReportImage(sanitizedFile);
+      if (sanitizedFileError) throw new Error(sanitizedFileError);
+      setFile(sanitizedFile);
+    } catch {
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      setError('Fotografia nuk mund të përgatitej pa metadata private. Provo një fotografi tjetër.');
+    } finally {
+      setSanitizingImage(false);
+    }
   }
 
   function resetForm() {
@@ -70,6 +161,11 @@ export function ReportForm({ categories }: { categories: Category[] }) {
     setError(null);
     setWarning(null);
     setNotice(null);
+    if (sanitizingImage) {
+      setError('Prit derisa fotografia të përgatitet për ngarkim.');
+      return;
+    }
+
     const validationError = validateCitizenReport({
       title,
       description,
@@ -100,28 +196,35 @@ export function ReportForm({ categories }: { categories: Category[] }) {
     }
 
     const report = result.report;
-    const supabase = createClient();
 
     if (file) {
       const { data: { user } } = await supabase.auth.getUser();
-      const objectPath = `reports/${report.id}/${crypto.randomUUID()}-${sanitizeFileName(file.name)}`;
-      const { error: uploadError } = user ? await supabase.storage.from('report-evidence').upload(objectPath, file, {
+      if (!user) {
+        resetForm();
+        setLoading(false);
+        setWarning(`Raportimi #${report.reportNumber} u ruajt pa fotografi, sepse sesioni skadoi gjatë ngarkimit.`);
+        router.refresh();
+        return;
+      }
+
+      const objectPath = `reports/${report.id}/${crypto.randomUUID()}.${imageExtension(file.type)}`;
+      const { error: uploadError } = await supabase.storage.from('report-evidence').upload(objectPath, file, {
         cacheControl: '3600',
         contentType: file.type,
         upsert: false,
-      }) : { error: new Error('Session expired') };
+      });
 
       if (uploadError) {
         resetForm();
         setLoading(false);
-        setWarning(`Raportimi #${report.reportNumber} u ruajt, por fotografia nuk u ngarkua. Mund ta provosh përsëri nga raportimet e tua.`);
+        setWarning(`Raportimi #${report.reportNumber} u ruajt pa fotografi, sepse ngarkimi i skedarit dështoi.`);
         router.refresh();
         return;
       }
 
       const { error: attachmentError } = await supabase.from('report_attachments').insert({
         report_id: report.id,
-        uploaded_by: user?.id,
+        uploaded_by: user.id,
         bucket_id: 'report-evidence',
         object_path: objectPath,
         kind: 'evidence',
@@ -131,10 +234,19 @@ export function ReportForm({ categories }: { categories: Category[] }) {
       });
 
       if (attachmentError) {
-        await supabase.storage.from('report-evidence').remove([objectPath]);
+        const { error: cleanupError } = await supabase.storage
+          .from('report-evidence')
+          .remove([objectPath]);
+        if (cleanupError) {
+          console.error('Unregistered evidence cleanup failed', cleanupError);
+        }
         resetForm();
         setLoading(false);
-        setWarning(`Raportimi #${report.reportNumber} u ruajt, por fotografia nuk u regjistrua. Prova e papërdorur u hoq.`);
+        setWarning(
+          cleanupError
+            ? `Raportimi #${report.reportNumber} u ruajt pa fotografi. Skedari i paregjistruar mbetet privat, por pastrimi automatik nuk përfundoi.`
+            : `Raportimi #${report.reportNumber} u ruajt pa fotografi. Skedari i paregjistruar u hoq automatikisht.`,
+        );
         router.refresh();
         return;
       }
@@ -165,15 +277,38 @@ export function ReportForm({ categories }: { categories: Category[] }) {
         <div className="flex items-start gap-3 border-b border-slate-100 pb-5"><span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700"><MapPin className="h-5 w-5" aria-hidden="true" /></span><div><h2 className="font-black tracking-tight text-slate-950">Lokacioni</h2><p className="mt-1 text-sm leading-6 text-slate-600">Lokacioni i saktë ruhet vetëm për trajtimin e raportit dhe nuk publikohet.</p></div></div>
         <div className="mt-6"><LocationPicker value={coordinates} onChange={setCoordinates} /></div>
         <div className="mt-5"><label htmlFor="report-address" className="mb-2 block text-sm font-bold text-slate-800">Përshkrim i shkurtër i vendit <span className="font-normal text-slate-500">(opsionale)</span></label><input id="report-address" value={addressText} onChange={(event) => setAddressText(event.target.value)} maxLength={240} placeholder="p.sh. pranë shkollës së lagjes" className="field-input" /><p className="mt-1.5 text-xs text-slate-500">Mos vendos adresë shtëpie ose informacion që identifikon persona.</p></div>
+        {categoryId && coordinates ? (
+          <div className="mt-5" aria-live="polite">
+            {similarReportsLoading ? (
+              <div className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-600"><LoaderCircle className="h-4 w-4 animate-spin text-blue-600" aria-hidden="true" /> Duke kontrolluar raportimet e ngjashme...</div>
+            ) : similarReportsError ? (
+              <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-900">{similarReportsError}</div>
+            ) : similarReports.length > 0 ? (
+              <div className="rounded-2xl border border-amber-200 bg-amber-50/80 p-4">
+                <div className="flex gap-3"><SearchCheck className="mt-0.5 h-5 w-5 shrink-0 text-amber-700" aria-hidden="true" /><div><h3 className="text-sm font-black text-amber-950">Ka raportime të ngjashme pranë</h3><p className="mt-1 text-xs leading-5 text-amber-900">Kontrollo nëse problemi është raportuar tashmë para se të krijosh një tjetër.</p></div></div>
+                <ul className="mt-3 space-y-2">
+                  {similarReports.map((similarReport) => (
+                    <li key={similarReport.id} className="flex flex-col gap-2 rounded-xl border border-amber-100 bg-white px-3 py-2.5 sm:flex-row sm:items-center sm:justify-between">
+                      <div className="min-w-0"><p className="truncate text-sm font-bold text-slate-900">#{similarReport.report_number} · {similarReport.title}</p><p className="mt-0.5 text-xs text-slate-500">Rreth {Math.max(50, similarReport.distance_m)} m larg</p></div>
+                      <ReportStatusBadge status={similarReport.status} />
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-800"><SearchCheck className="h-4 w-4" aria-hidden="true" /> Nuk u gjetën raportime aktive të ngjashme pranë.</div>
+            )}
+          </div>
+        ) : null}
       </Card>
 
       <Card className="p-5 sm:p-7">
         <div className="flex items-start gap-3 border-b border-slate-100 pb-5"><span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-50 text-violet-700"><FileImage className="h-5 w-5" aria-hidden="true" /></span><div><h2 className="font-black tracking-tight text-slate-950">Fotografia e provës</h2><p className="mt-1 text-sm leading-6 text-slate-600">Një fotografi ndihmon në verifikim. Ngarko vetëm materiale sintetike ose të përshtatshme për demonstrim.</p></div></div>
-        <div className="mt-6 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-5"><label htmlFor="report-photo" className="flex cursor-pointer flex-col items-center justify-center text-center"><span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-violet-700 shadow-sm"><UploadCloud className="h-6 w-6" aria-hidden="true" /></span><span className="mt-3 text-sm font-bold text-slate-800">Zgjidh një fotografi</span><span className="mt-1 text-xs text-slate-500">JPG, PNG ose WebP · maksimumi 10 MB</span><input ref={fileInputRef} id="report-photo" type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={(event) => handleFileChange(event.target.files?.[0] ?? null)} /></label>{file ? <div className="mt-4 flex items-center justify-between gap-3 rounded-xl border border-violet-100 bg-white px-3 py-2.5 text-sm"><span className="flex min-w-0 items-center gap-2 text-slate-700"><FileImage className="h-4 w-4 shrink-0 text-violet-600" aria-hidden="true" /><span className="truncate">{file.name}</span></span><button type="button" onClick={() => handleFileChange(null)} className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-900" aria-label="Hiqe fotografinë"><X className="h-4 w-4" aria-hidden="true" /></button></div> : null}</div>
+        <div className="mt-6 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-5"><label htmlFor="report-photo" className="flex cursor-pointer flex-col items-center justify-center text-center"><span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-violet-700 shadow-sm">{sanitizingImage ? <LoaderCircle className="h-6 w-6 animate-spin" aria-hidden="true" /> : <UploadCloud className="h-6 w-6" aria-hidden="true" />}</span><span className="mt-3 text-sm font-bold text-slate-800">{sanitizingImage ? 'Duke hequr metadata private...' : 'Zgjidh një fotografi'}</span><span className="mt-1 text-xs text-slate-500">JPG, PNG ose WebP · maksimumi 10 MB</span><input ref={fileInputRef} id="report-photo" type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" disabled={sanitizingImage || loading} onChange={(event) => void handleFileChange(event.target.files?.[0] ?? null)} /></label>{file ? <div className="mt-4 flex items-center justify-between gap-3 rounded-xl border border-emerald-100 bg-white px-3 py-2.5 text-sm"><span className="flex min-w-0 items-center gap-2 text-slate-700"><ShieldCheck className="h-4 w-4 shrink-0 text-emerald-600" aria-hidden="true" /><span className="min-w-0"><span className="block truncate">{file.name}</span><span className="block text-xs font-semibold text-emerald-700">EXIF/GPS metadata u hoq para ngarkimit</span></span></span><button type="button" onClick={() => void handleFileChange(null)} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-900" aria-label="Hiqe fotografinë"><X className="h-4 w-4" aria-hidden="true" /></button></div> : null}</div>
       </Card>
 
       <div className="flex gap-3 rounded-2xl border border-blue-100 bg-blue-50/70 px-4 py-3.5 text-sm leading-6 text-blue-950"><Info className="mt-0.5 h-5 w-5 shrink-0 text-blue-700" aria-hidden="true" /><p><strong>Privatësia:</strong> emri, email-i, fotografia dhe lokacioni i saktë nuk publikohen në hartën publike. Për emergjenca, përdor kanalet zyrtare të emergjencës; kjo platformë trajton vetëm çështje jo-emergjente.</p></div>
-      <Button type="submit" size="lg" className="w-full sm:w-auto" disabled={loading}><Send className="h-4 w-4" aria-hidden="true" />{loading ? 'Duke dorëzuar...' : 'Dorëzo raportimin'}</Button>
+      <Button type="submit" size="lg" className="w-full sm:w-auto" disabled={loading || sanitizingImage}><Send className="h-4 w-4" aria-hidden="true" />{loading ? 'Duke dorëzuar...' : sanitizingImage ? 'Duke përgatitur fotografinë...' : 'Dorëzo raportimin'}</Button>
     </form>
   );
 }

@@ -1,4 +1,4 @@
-# Modeli i databazës — Sprint 2
+# Modeli i databazës — Sprintet 2–5
 
 ## Entitetet
 
@@ -15,17 +15,22 @@ reports    1──* notifications
 
 - `profiles` zgjeron `auth.users`; roli është `citizen`, `official` ose `admin`.
 - `reports.location` është lokacioni privat i saktë në PostGIS.
-- `reports.public_location` është lokacioni i përshtatur për publikim dhe përdoret vetëm kur `is_public = true`.
+- `reports.public_location` llogaritet vetëm nga trigger-i përmes
+  `generalize_location(location, 500)`. Klienti nuk kontrollon koordinatën
+  publike; pika vendoset në grid afërsisht 500 m dhe duhet të jetë së paku
+  50 m larg pikës private.
 - `report_attachments` ruan vetëm `object_path`, jo URL publike të përhershme. `is_internal` ndan provat e stafit nga provat që mund t'i shohë qytetari.
 - `report_status_history` dhe `audit_logs` krijohen nga trigger-a server-side, jo nga browser-i.
+- `report_comments` janë immutable: një korrigjim ruhet si koment i ri, jo si
+  ndryshim i historikut ekzistues.
 
 ## Statuset e lejuara
 
 ```text
 submitted -> under_review -> assigned -> in_progress -> resolved
-                  |              |
-                  v              v
-               rejected        rejected
+                  |
+                  v
+               rejected
 
 resolved -> reopened -> under_review
 ```
@@ -34,8 +39,36 @@ Trigger-i i databazës bllokon kalimet e paligjshme. `resolved` kërkon `resolut
 
 ## Privatësia
 
-Anon dhe authenticated nuk lexojnë drejtpërdrejt `public.reports`. Ato lexojnë vetëm views publike, të cilat filtrohen te `is_public = true` dhe nuk përmbajnë `citizen_id`, email, telefon, `author_id` ose lokacionin privat. Fotografitë ruhen në bucket privat; objektet e brendshme nuk mund të lexohen nga qytetari.
+Anon lexon vetëm views publike. Përdoruesit e autentikuar lexojnë tabelën
+`public.reports` vetëm përmes RLS-së si pronar ose staf i autorizuar, ndërsa
+faqet publike përdorin views që filtrohen te `is_public = true` dhe nuk
+përmbajnë `citizen_id`, email, telefon, `author_id` ose lokacionin privat.
+Fotografitë ruhen në bucket privat; objektet e brendshme nuk mund të lexohen
+nga qytetari.
+
+RPC-ja `suggest_similar_reports` është `security definer`, por mund të
+ekzekutohet vetëm nga `authenticated`. Për raportet e qytetarëve të tjerë ajo
+kërkon vetëm mbi `public_location`, kthen titullin publik dhe rrumbullakon
+distancën në hapa 50 m. Raportet private përfshihen vetëm kur i përkasin
+qytetarit aktual.
+
+## Mbrojtja nga abuzimi dhe RBAC
+
+- Trigger-i i raportit lejon maksimumi 5 raportime për qytetar brenda 5
+  minutave dhe përdor transaction advisory lock për të shmangur bypass-in me
+  kërkesa paralele. Për insert-e të autentikuara `created_at` mbishkruhet me
+  kohën e serverit.
+- `profiles_admin_update` lejon vetëm administratorin të ndryshojë profile të
+  tjera.
+- Një profil me rolin `official` duhet të ketë `department_id`.
+- Qytetari nuk ka policy të gjerë `UPDATE` mbi raportin e dorëzuar; editimi
+  mund të shtohet vetëm më vonë me fusha të kufizuara ose RPC të dedikuar.
+- `report_attachments.report_id` duhet të jetë i njëjti UUID që ndodhet në
+  `object_path`, dhe qytetari mund të regjistrojë vetëm llojin `evidence`.
 
 ## SLA
 
 `categories.default_sla_hours` është burimi i SLA-së fillestare. Trigger-i vendos `reports.sla_due_at` gjatë insert-it; përdoruesi nuk mund ta zgjatë vetë afatin duke dërguar një vlerë tjetër.
+
+ER diagrami autoritativ dhe state machine-i i sinkronizuar me migrations janë
+te [`diagrams/README.md`](../diagrams/README.md).

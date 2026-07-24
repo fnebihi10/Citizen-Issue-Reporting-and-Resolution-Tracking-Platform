@@ -10,7 +10,7 @@ const buttonVariants = {
 } as const;
 
 const buttonSizes = {
-  sm: 'h-9 rounded-lg px-3 text-sm',
+  sm: 'h-11 rounded-lg px-3 text-sm',
   md: 'h-11 rounded-xl px-4 text-sm',
   lg: 'h-12 rounded-xl px-5 text-base',
 } as const;

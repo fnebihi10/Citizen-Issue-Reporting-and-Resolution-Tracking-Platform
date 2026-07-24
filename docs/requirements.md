@@ -1,95 +1,193 @@
 # Software Requirements Specification
 
-## 1. Përshkrimi i sistemit
+Ky dokument përmbledh kërkesat zyrtare të mentorit për temën:
+**“Zhvillimi i një platforme për raportimin, ndjekjen dhe zgjidhjen e
+problemeve qytetare”**. Kërkesat këtu kanë përparësi ndaj preferencave të
+mëparshme të dizajnit; `docs/roadmap.md` përcakton rendin e implementimit.
 
-Platforma "Citizen Issue Reporting and Resolution Tracking Platform"
-është një aplikacion web që mundëson qytetarët të raportojnë probleme lokale
-dhe zyrtarët komunalë t'i menaxhojnë ato deri në zgjidhje.
+## 1. Qëllimi dhe fusha
 
----
+Platforma është aplikacion web responsive ku qytetarët raportojnë probleme
+lokale jo-emergjente, ndërsa zyrtarët i verifikojnë, i caktojnë dhe e
+dokumentojnë procesin deri në zgjidhje. Vizitorët publikë shohin transparencë
+mbi problemin dhe progresin pa identitetin, kontaktet ose lokacionin e saktë të
+raportuesit.
 
-# 2. Aktorët e sistemit
+## 2. Aktorët
 
-## Qytetari
-- Krijon raport
-- Shikon statusin e raportit
-- Merr njoftime
-- Komenton në raport
+### Qytetari
 
-## Zyrtari Komunal
-- Verifikon raportet
-- Cakton departamentin
-- Ndryshon statusin
-- Shton komente
+- krijon llogari dhe autentikohet;
+- krijon raport me kategori, lokacion dhe fotografi;
+- sheh raportimet dhe statusin e vet;
+- merr njoftime dhe komunikon me komente.
 
-## Administratori
-- Menaxhon përdoruesit
-- Menaxhon kategoritë
-- Shikon statistika
-- Eksporton të dhëna
+### Zyrtari komunal
 
-## Vizitori Publik
-- Shikon hartën publike
-- Shikon raportet e zgjidhura
-- Nuk sheh të dhëna private
+- sheh inbox-in e autorizuar;
+- verifikon raportet dhe cakton departamentin;
+- ndryshon statusin sipas workflow-t;
+- shton komente dhe dokumenton zgjidhjen.
 
----
+### Administratori
 
-# 3. Kërkesat funksionale
+- menaxhon rolet, përdoruesit, departamentet dhe kategoritë;
+- konfiguron dhe monitoron SLA-të;
+- sheh audit log, statistika dhe heatmap;
+- eksporton të dhënat në CSV/JSON.
 
-## FR-01 Regjistrimi dhe autentifikimi
+### Vizitori publik
 
-Sistemi duhet të lejojë krijimin e llogarive dhe hyrjen sipas roleve.
+- sheh hartën dhe raportet e publikuara;
+- sheh statusin dhe historinë publike;
+- nuk sheh identitet, kontakt, lokacion privat ose prova të brendshme.
 
-## FR-02 Krijimi i raportit
+## 3. Kërkesat funksionale
 
-Qytetari duhet të mund të krijojë raport me:
+### FR-01 — Autentikimi dhe rolet
 
-- Titull
-- Përshkrim
-- Kategori
-- Lokacion në hartë
-- Fotografitë
+Sistemi duhet të mbështesë regjistrim, konfirmim email-i, hyrje, dalje dhe reset
+fjalëkalimi. Regjistrimi publik krijon vetëm rol `citizen`; rolet `official`
+dhe `admin` caktohen vetëm nga një administrator i autorizuar.
 
-## FR-03 Menaxhimi i statusit
+### FR-02 — Krijimi i raportit
 
-Raporti duhet të ketë këto statuse:
+Qytetari duhet të mund të dërgojë:
 
-- Dorëzuar
-- Në verifikim
-- Caktuar
-- Në proces
-- Zgjidhur
-- Refuzuar
-- Rihapur
+- titull;
+- përshkrim;
+- një nga kategoritë aktive;
+- lokacion të saktë në hartë;
+- përshkrim opsional të vendit;
+- fotografi prove në format të lejuar.
 
-## FR-04 Komentet
+### FR-03 — Kategoritë fillestare
 
-Përdoruesit duhet të mund të komunikojnë përmes komenteve.
+Sistemi duhet të ketë së paku:
 
-## FR-05 Historia e ndryshimeve
+- rrugë dhe gropa;
+- ndriçim publik;
+- mbeturina;
+- sinjalistikë.
 
-Sistemi duhet të ruajë çdo ndryshim të raportit.
+### FR-04 — Verifikimi dhe caktimi
 
----
+Zyrtari duhet të verifikojë raportin dhe ta caktojë te departamenti përgjegjës.
+Qytetari nuk mund të vendosë vetë prioritet, departament, zyrtar ose gjendje
+publikimi.
 
-# 4. Kërkesat jofunksionale
+### FR-05 — Workflow i statuseve
 
-## NFR-01 Siguria
+Statuset janë:
 
-- Kontroll sipas roleve
-- Validim inputesh
-- Rate limiting
-- Audit log
+- `submitted` — dorëzuar;
+- `under_review` — në verifikim;
+- `assigned` — caktuar;
+- `in_progress` — në proces;
+- `resolved` — zgjidhur;
+- `rejected` — refuzuar;
+- `reopened` — rihapur.
 
-## NFR-02 Performanca
+Kalimet e palejuara duhet të bllokohen nga databaza. Zgjidhja kërkon shënime
+zgjidhjeje; refuzimi kërkon arsye.
 
-Sistemi duhet të përballojë minimum 100 raportime sintetike.
+### FR-06 — Komentet, historia dhe njoftimet
 
-## NFR-03 Privatësia
+Sistemi duhet të ruajë komentet, historinë e plotë të statuseve dhe njoftimet
+për qytetarin. Shënimet e brendshme të stafit nuk publikohen dhe nuk i
+shfaqen qytetarit.
 
-Identiteti i raportuesit nuk duhet të shfaqet publikisht.
+### FR-07 — SLA
 
-## NFR-04 Përdorshmëria
+Çdo kategori ka afat fillestar SLA. Sistemi llogarit afatin gjatë krijimit,
+identifikon raportet e vonuara dhe i paraqet ato në panelin e stafit.
 
-Ndërfaqja duhet të jetë responsive për desktop dhe telefon.
+### FR-08 — Transparenca publike
+
+Harta dhe faqet publike duhet të lexojnë vetëm të dhëna të sanitizuara:
+kategori, titull/përmbledhje publike, status, histori publike dhe lokacion të
+përgjithësuar. Identiteti, kontakti, pika private dhe provat e brendshme nuk
+duhet të ekspozohen.
+
+### FR-09 — Administrimi dhe analitika
+
+Paneli administrativ duhet të ofrojë filtra, statistika, heatmap, menaxhim të
+përdoruesve/departamenteve/kategorive dhe eksport CSV/JSON.
+
+### FR-10 — Sugjerimi i raportimeve të ngjashme
+
+Para dërgimit, sistemi mund të sugjerojë raporte aktive sipas kategorisë,
+distancës dhe kohës. Rezultati nuk duhet të zbulojë koordinata private ose
+raporte private të qytetarëve të tjerë.
+
+### FR-11 — Kontrolli dhe auditimi
+
+Sistemi duhet të zbatojë RBAC/RLS, validim klient/server/databazë, rate
+limiting dhe audit log për ndryshimet e ndjeshme.
+
+### FR-12 — Rastet emergjente
+
+Platforma nuk pranon trajtim emergjencash. UI-ja duhet ta shpjegojë qartë këtë
+kufi dhe ta drejtojë përdoruesin te kanalet zyrtare të emergjencës.
+
+## 4. Kërkesat jofunksionale
+
+### NFR-01 — Siguria
+
+- parimi least privilege dhe RLS në tabelat me të dhëna private;
+- session cookies të sigurta dhe redirect-e vetëm drejt path-eve të brendshme;
+- private Object Storage dhe prova immutable pas regjistrimit;
+- inpute të kufizuara dhe të parametrizuara;
+- dependency audit dhe security headers.
+
+### NFR-02 — Privatësia
+
+- asnjë emër, email, telefon ose pikë e saktë në API-në publike;
+- EXIF/GPS hiqet nga fotografia para upload-it të aplikacionit;
+- `public_location` llogaritet vetëm nga serveri;
+- përdoren vetëm të dhëna sintetike në demo, dokumentim dhe punim.
+
+### NFR-03 — Performanca dhe kapaciteti
+
+Sistemi duhet të demonstrojë së paku 100 raportime sintetike. Harta dhe listat
+duhet të kenë kufij query-sh dhe indekse për pronarin, statusin, SLA-në dhe
+lokacionin.
+
+### NFR-04 — Përdorshmëria dhe accessibility
+
+Ndërfaqja duhet të jetë mobile-first, responsive, me label-a, fokus të dukshëm,
+target-e interaktive së paku 44 px dhe feedback loading/error/empty/success.
+
+### NFR-05 — Mirëmbajtja
+
+TypeScript përdoret në strict mode; migrations janë burimi autoritativ i
+skemës; tipet e Supabase gjenerohen nga skema dhe dokumentet përditësohen kur
+ndryshon implementimi.
+
+### NFR-06 — Testimi dhe vlerësimi
+
+Paketa përfundimtare duhet të ketë së paku 25 teste funksionale, edge dhe
+sigurie, dataset 100+, si dhe — nëse është e mundur — usability test me 5–10
+persona.
+
+## 5. Kufijtë e detyrueshëm
+
+Nuk kërkohen integrime reale me komunën, identitet elektronik shtetëror,
+pagesa, aplikacion native ose AI për klasifikim fotografie. Nuk përdoren emra,
+adresa, foto ose lokacione që identifikojnë persona realë.
+
+## 6. Gjendja sipas roadmap-it
+
+| Fusha | Gjendja pas Sprintit 5 |
+|---|---|
+| Foundation, arkitekturë dhe design system | Implementuar |
+| PostgreSQL/PostGIS, RLS dhe Storage privat | Implementuar |
+| Auth, profiles dhe route protection | Implementuar |
+| Shell/hartë publike bazë | Implementuar |
+| Krijimi/lista e raporteve qytetare | Implementuar |
+| Lokacion publik, EXIF, rate limit, duplicate suggestion | Implementuar |
+| Workflow zyrtari, komente operative, njoftime, detaj raporti | Sprint 6 |
+| Administrim, SLA dashboard, audit i zgjeruar, eksport | Sprint 7 |
+| Public detail, filtra, heatmap dhe analitika | Sprint 8 |
+| 25+ teste, accessibility/performance/usability evaluation | Sprint 9 |
+| Deploy dhe paketa finale e tezës | Sprint 10 |

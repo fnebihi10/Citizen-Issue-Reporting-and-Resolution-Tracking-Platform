@@ -1,12 +1,13 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { getPublicSupabaseConfig } from '@/lib/env';
+import type { Database } from '@/types/supabase';
 
 export async function createClient() {
   const cookieStore = await cookies();
   const { supabasePublishableKey, supabaseUrl } = getPublicSupabaseConfig();
 
-  return createServerClient(
+  return createServerClient<Database>(
     supabaseUrl,
     supabasePublishableKey,
     {
@@ -16,7 +17,7 @@ export async function createClient() {
         },
         setAll(
           cookiesToSet: { name: string; value: string; options: CookieOptions }[],
-          headers: Record<string, string>,
+          headers: Record<string, string> = {},
         ) {
           void headers;
           try {

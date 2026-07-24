@@ -24,7 +24,7 @@ Ky plan testimi përshkruan qasjen për të vlerësuar funksionalitetin dhe sigu
 
 ### 2. Testet e Skajeve (Edge Cases / Boundary Testing)
 11. **Përshkrimet e gjata**: Testo formën e raportimit me inpute teksti mbi limitin normal (p.sh., 5000 karaktere).
-12. **Fotografi të mëdha/jo-valide**: Provo të ngarkosh fajlla `.pdf` ose foto me madhësi >20MB.
+12. **Fotografi të mëdha/jo-valide**: Provo të ngarkosh fajlla `.pdf`, skedar bosh ose foto me madhësi >10MB.
 13. **Lokacione jashtë Komunës**: Testo bllokimin ose paralajmërimin nëse klikohet një lokacion i pamundur.
 14. **Kalim i papritur statusi**: Provo të kalosh një raport direkt nga `dorëzuar` në `zgjidhur` (duhet të pengohet nëse e theksuar në rregullat e tranzicionit).
 15. **SLA skaduar**: Llogaritja e saktë kur afati kohor i trajtimit vonohet me sekonda/minuta pas limitit.
@@ -34,7 +34,7 @@ Ky plan testimi përshkruan qasjen për të vlerësuar funksionalitetin dhe sigu
 ### 3. Testet e Sigurisë (Security Testing)
 18. **Autorizimi i Roleve**: Një "Vizitor Publik" nuk mund të qaset në `/account`, `/official` ose `/admin`.
 19. **Privatësia në Hartë**: Vizitori publik nuk mund të gjejë asnjë gjurmë të IP-së apo emailit të qytetarit në request-et e hartës (API).
-20. **Rate Limiting**: Blloko thirrjet abuzive për krijimin e raporteve (p.sh., 10 raporte nga i njëjti IP brenda 1 minute).
+20. **Rate Limiting**: Raporti i gjashtë nga i njëjti qytetar brenda 5 minutave bllokohet edhe kur klienti dërgon `created_at` të falsifikuar.
 21. **XSS Protection**: Fusha e përshkrimit nuk duhet të ekzekutojë skripte nëse shtohet kod `<script>alert(1)</script>`.
 22. **CSRF**: Formulari i dërgimit duhet të mbrohet kundër sulmeve CSRF.
 23. **SQL/NoSQL Injection**: Inputet në filtra dhe search duhet të jenë të pastruara.
@@ -49,3 +49,22 @@ Ky plan testimi përshkruan qasjen për të vlerësuar funksionalitetin dhe sigu
 ## Mjedisi dhe Mjetet e Testimit
 - **Dataset**: `dataset/synthetic_dataset.json` me 120 raporte deterministike.
 - **Mjetet e planifikuara**: Playwright/Vitest për testet e automatizuara, Supabase SQL Editor për RLS dhe testime manuale vizuale. Nuk deklarojmë asnjë test si të kaluar para ekzekutimit të tij.
+
+## Automatizimi aktual para Sprintit 6
+
+- `npm test` ekzekuton 37 teste Vitest për password/redirect/RBAC, validimin e
+  raportit, normalizimin e view-t publik dhe heqjen fail-closed të EXIF/GPS.
+- `npm run check:dataset` kontrollon që JSON-i me 120 raporte dhe SQL seed-i të
+  jenë gjeneruar nga i njëjti burim.
+- `supabase/tests/database/pre_sprint6_hardening.test.sql` mbulon
+  përgjithësimin e lokacionit, privilegjet e RPC-së, komentet immutable,
+  admin policy, RBAC, 120 raportet dhe rate limit-in me 21 assertions.
+  Ekzekutohet me
+  `npx supabase test db` pasi Supabase lokal/Docker të jetë aktiv.
+- `npm run verify:remote -- --allow-dev` verifikon krijimin e raportit qytetar,
+  kufijtë e RPC-së, ndalimin e update-it direkt dhe upload/download-in privat
+  e immutable të një prove sintetike në projektin e hostuar.
+- `npm run verify:local-auth -- --allow-dev` verifikon cookie/header-at SSR,
+  faqet e autentikuara dhe ndalimin e route-ve `official`/`admin` për qytetarin.
+- Këto kontrolle nuk zëvendësojnë paketën përfundimtare me 25+ skenarë
+  funksionalë, të skajeve dhe të sigurisë të Sprintit 9.

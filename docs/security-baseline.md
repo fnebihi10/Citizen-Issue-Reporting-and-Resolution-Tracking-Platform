@@ -2,14 +2,37 @@
 
 ## E implementuar në kod
 
-- Next.js 16 Active LTS dhe dependency audit pa vulnerabilitete të raportuara.
-- Proxy i kufizuar vetëm te route-t autentikuese dhe të mbrojtura.
+- Next.js `16.2.11` dhe dependency audit pa vulnerabilitete të raportuara.
+- Proxy i kufizuar te route-t e mbrojtura, me role nga `profiles`: `citizen`,
+  `official`/`admin` dhe `admin`.
 - PKCE callback, session cookies dhe përgjigje auth me `no-store`.
 - Redirect-e vetëm drejt path-eve të brendshme të validuara.
 - Fjalëkalim minimal 10 karaktere me shkronja të mëdha/vogla dhe numër.
 - Security headers: `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, `Cross-Origin-Opener-Policy` dhe HSTS në production.
+- Header-i identifikues `X-Powered-By` është çaktivizuar.
 - RLS për profile, raporte, komente, attachments, njoftime dhe audit logs.
 - Views publike të kufizuara vetëm te raporte të publikuara; bucket i provave është privat dhe immutable.
+- Lokacioni publik gjenerohet server-side në grid 500 m dhe nuk pranon
+  koordinatë publike të kontrolluar nga klienti.
+- Fotografitë dekodohen dhe ri-enkodohen në browser para upload-it; nëse
+  metadata EXIF/GPS nuk mund të hiqet, upload-i bllokohet.
+- Krijimi i raportit kufizohet në 5 raporte për qytetar brenda 5 minutave në
+  nivel databaze.
+- RPC-ja e raporteve të ngjashme ekspozon vetëm lokacione publike të
+  përgjithësuara ose raportet private të vetë qytetarit, me distancë të
+  rrumbullakuar.
+- Supabase clients përdorin tipe të gjeneruara nga skema remote; query-t nuk
+  mbështeten më në `as Report[]`.
+- `report_number`, pronari dhe `created_at` kontrollohen nga serveri; një
+  timestamp i falsifikuar nuk anashkalon rate limit-in.
+- Qytetari nuk ka policy për ndryshimin direkt të raportit pas dorëzimit dhe
+  insert-i kërkon rolin autoritativ `citizen`; qytetari nuk mund të
+  regjistrojë provë me llojin `resolution`.
+- Storage path-i duhet të përputhet me `report_id`; objekti mund të pastrohet
+  nga uploader-i vetëm para regjistrimit të metadata-s. Pas regjistrimit prova
+  është immutable, përveç ndërhyrjes administrative.
+- SECURITY DEFINER functions përdorin `search_path` bosh dhe rolet e Data API
+  nuk kanë privilegj `CREATE` në schema `public`.
 
 ## Konfigurime manuale para deploy-it
 

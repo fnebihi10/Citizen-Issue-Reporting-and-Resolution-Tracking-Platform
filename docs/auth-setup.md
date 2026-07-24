@@ -36,6 +36,16 @@ Për testim lokal, këto vlera janë pasqyruar edhe te [`supabase/config.toml`](
 
 `@supabase/ssr` përdor PKCE dhe cookie-based sessions. Callback-i ruan përgjigjet e autentikimit me `Cache-Control: private, no-store`, për të shmangur cache të session cookie-ve.
 
+Proxy kontrollon rolin nga `profiles`, jo nga metadata e klientit:
+
+- `/citizen/*` — vetëm `citizen`;
+- `/official/*` — `official` ose `admin`;
+- `/admin/*` — vetëm `admin`;
+- `/account` — çdo përdorues i autentikuar.
+
+Redirect-et e Proxy-t bartin edhe cookie-t/header-at e një session refresh-i, që
+kontrolli i rolit të mos ndërpresë rifreskimin e vlefshëm të sesionit.
+
 ## Rolet
 
 Signup-i krijon gjithmonë `citizen` në trigger-in e databazës. `official` dhe `admin` nuk mund të caktohen nga browser-i; do të menaxhohen në panelin administrativ në Sprintin 7.

@@ -12,6 +12,7 @@
 
 - Commit-e të vogla me format `type(scope): message`, për shembull `feat(reporting): add report draft form`.
 - `.env.local`, service keys, dumps dhe output-e build nuk commit-ohen.
+- Skedarët tekst ruhen UTF-8 me LF sipas `.gitattributes`, edhe kur zhvillimi bëhet në Windows.
 - Çdo sprint mbyllet me build dhe kontroll të ndryshimeve.
 
 ## UX dhe accessibility

@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { CalendarDays, ChevronRight, FilePlus2, Flag, Mail, ShieldCheck, UserRound } from 'lucide-react';
+import { AlertTriangle, CalendarDays, ChevronRight, FilePlus2, Flag, Mail, ShieldCheck, UserRound } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { SignOutButton } from '@/components/auth/SignOutButton';
 import { Card } from '@/components/ui/card';
@@ -16,7 +16,13 @@ const roleLabels: Record<UserRole, string> = {
   admin: 'Administrator',
 };
 
-export default async function AccountPage() {
+type AccountPageProps = {
+  searchParams: Promise<{ error?: string | string[] }>;
+};
+
+export default async function AccountPage({ searchParams }: AccountPageProps) {
+  const params = await searchParams;
+  const accessDenied = params.error === 'forbidden';
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -28,7 +34,7 @@ export default async function AccountPage() {
     .eq('id', user.id)
     .maybeSingle();
 
-  const role = (profile?.role ?? 'citizen') as UserRole;
+  const role: UserRole = profile?.role ?? 'citizen';
   const fullName = profile?.full_name ?? 'Qytetar';
 
   return (
@@ -41,6 +47,12 @@ export default async function AccountPage() {
       </header>
 
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
+        {accessDenied ? (
+          <div role="alert" className="mb-6 flex gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3.5 text-sm leading-6 text-amber-900">
+            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0" aria-hidden="true" />
+            <span>Roli i llogarisë sate nuk ka qasje në atë hapësirë.</span>
+          </div>
+        ) : null}
         <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.16em] text-blue-600">Sesioni është aktiv</p>

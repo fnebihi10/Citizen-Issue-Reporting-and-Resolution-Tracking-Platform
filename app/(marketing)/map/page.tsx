@@ -3,9 +3,9 @@ import { Clock3, MapPinned, ShieldCheck } from 'lucide-react';
 import { PublicIssueMapLoader } from '@/components/map/PublicIssueMapLoader';
 import { EmptyState, ErrorState } from '@/components/ui/FeedbackState';
 import { ReportStatusBadge } from '@/components/reports/ReportStatusBadge';
+import { toPublicReport } from '@/lib/reports/publicReport';
 import { createClient } from '@/lib/supabase/server';
 import { formatDate } from '@/lib/utils';
-import type { PublicReport } from '@/types/database';
 import { buttonVariantsClass } from '@/components/ui/button';
 
 export const dynamic = 'force-dynamic';
@@ -13,7 +13,9 @@ export const dynamic = 'force-dynamic';
 export default async function PublicMapPage() {
   const supabase = await createClient();
   const { data, error } = await supabase.from('public_reports').select('*').order('created_at', { ascending: false }).limit(500);
-  const reports = (data ?? []) as PublicReport[];
+  const reports = (data ?? [])
+    .map(toPublicReport)
+    .filter((report) => report !== null);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">

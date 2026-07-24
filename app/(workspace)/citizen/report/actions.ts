@@ -7,6 +7,14 @@ type CreateCitizenReportResult =
   | { ok: true; report: { id: string; reportNumber: number } }
   | { ok: false; error: string };
 
+function friendlyCreateReportError(error: { message?: string } | null) {
+  if (error?.message === 'REPORT_RATE_LIMIT_EXCEEDED') {
+    return 'Ke arritur kufirin prej 5 raportimeve brenda 5 minutave. Provo përsëri pas pak.';
+  }
+
+  return 'Raportimi nuk mund të ruhej tani. Provo përsëri pas pak.';
+}
+
 export async function createCitizenReport(input: ReportDraftInput): Promise<CreateCitizenReportResult> {
   const validationError = validateCitizenReport(input);
   if (validationError) return { ok: false, error: validationError };
@@ -14,6 +22,16 @@ export async function createCitizenReport(input: ReportDraftInput): Promise<Crea
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: 'Sesioni yt ka skaduar. Hyr përsëri për të dorëzuar raportimin.' };
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .maybeSingle();
+
+  if (profile?.role !== 'citizen') {
+    return { ok: false, error: 'Vetëm llogaritë me rolin qytetar mund të dorëzojnë raportime.' };
+  }
 
   const { data: category } = await supabase
     .from('categories')
@@ -36,7 +54,6 @@ export async function createCitizenReport(input: ReportDraftInput): Promise<Crea
       department_id: null,
       assigned_official_id: null,
       is_public: false,
-      public_location: null,
       location: `SRID=4326;POINT(${input.longitude} ${input.latitude})`,
       address_text: input.addressText.trim() || null,
     })
@@ -45,7 +62,7 @@ export async function createCitizenReport(input: ReportDraftInput): Promise<Crea
 
   if (error || !report) {
     console.error('Citizen report creation failed', error);
-    return { ok: false, error: 'Raportimi nuk mund të ruhej tani. Provo përsëri pas pak.' };
+    return { ok: false, error: friendlyCreateReportError(error) };
   }
 
   return { ok: true, report: { id: report.id, reportNumber: report.report_number } };

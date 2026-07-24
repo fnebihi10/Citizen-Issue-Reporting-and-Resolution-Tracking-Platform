@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import { AuthShell } from '@/components/auth/AuthShell';
+import { FocusedAuthShell } from '@/components/auth/FocusedAuthShell';
 import { UpdatePasswordForm } from '@/components/auth/UpdatePasswordForm';
 import { createClient } from '@/lib/supabase/server';
 
@@ -14,8 +14,16 @@ export default async function UpdatePasswordPage() {
   }
 
   return (
-    <AuthShell eyebrow="Fjalëkalim i ri" title="Vendos një fjalëkalim të fortë." description="Ky veprim është i disponueshëm vetëm nëpërmjet një sesioni të vlefshëm rikuperimi." alternateText="Të kujtohet fjalëkalimi?" alternateHref="/login" alternateLabel="Hyr në llogari">
+    <FocusedAuthShell
+      eyebrow="Fjalëkalim i ri"
+      title="Vendos një fjalëkalim të fortë"
+      description="Ky veprim është i disponueshëm vetëm nëpërmjet një sesioni të vlefshëm rikuperimi."
+      alternateText="Të kujtohet fjalëkalimi?"
+      alternateHref="/login"
+      alternateLabel="Hyr në llogari"
+      variant="recovery"
+    >
       <UpdatePasswordForm />
-    </AuthShell>
+    </FocusedAuthShell>
   );
 }

@@ -9,7 +9,7 @@ type FocusedAuthShellProps = {
   alternateText: string;
   alternateHref: string;
   alternateLabel: string;
-  variant: 'login' | 'register';
+  variant: 'login' | 'register' | 'recovery';
   children: ReactNode;
 };
 
@@ -58,7 +58,7 @@ export function FocusedAuthShell({
 
             <Link
               href="/"
-              className="inline-flex h-10 items-center gap-1.5 rounded-full px-3 text-xs font-semibold text-slate-600 transition-colors hover:bg-white/85 hover:text-slate-950"
+              className="inline-flex h-11 items-center gap-1.5 rounded-full px-3 text-xs font-semibold text-slate-600 transition-colors hover:bg-white/85 hover:text-slate-950"
             >
               <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
               Ballina
