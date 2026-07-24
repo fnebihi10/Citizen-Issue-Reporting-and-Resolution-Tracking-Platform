@@ -1,4 +1,4 @@
-import { AuthShell } from '@/components/auth/AuthShell';
+import { FocusedAuthShell } from '@/components/auth/FocusedAuthShell';
 import { getSafeInternalPath } from '@/lib/auth/redirect';
 import { LoginForm } from '@/components/auth/LoginForm';
 
@@ -12,15 +12,16 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   const errorParam = typeof params.error === 'string' ? params.error : null;
 
   return (
-    <AuthShell
+    <FocusedAuthShell
       eyebrow="Qasje e sigurt"
-      title="Mirë se u ktheve."
-      description="Hyr me email-in e konfirmuar për të parë raportimet dhe historinë e tyre."
+      title="Mirë se u ktheve"
+      description="Hyr për të ndjekur raportimet e tua dhe hapat e trajtimit."
       alternateText="Nuk ke ende llogari?"
       alternateHref="/register"
       alternateLabel="Regjistrohu"
+      variant="login"
     >
       <LoginForm nextPath={getSafeInternalPath(nextParam)} callbackFailed={errorParam === 'callback'} />
-    </AuthShell>
+    </FocusedAuthShell>
   );
 }
