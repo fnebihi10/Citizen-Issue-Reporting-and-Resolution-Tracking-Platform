@@ -59,6 +59,8 @@ Dokumentimi zyrtar: [Supabase database migrations](https://supabase.com/docs/gui
 
 Nëse nuk e ke CLI-në, për këtë projekt mund t’i ekzekutosh SQL files në SQL Editor në të njëjtin rend, por më pas duhet ta regjistrojmë gjendjen me CLI që migration history të mos dalë jashtë sinkronizimit.
 
+Për zhvillim lokal, `supabase/seed.sql` krijon një përdorues dhe disa raportime publike plotësisht sintetike, që harta të mos duket bosh gjatë demonstrimit. Seed-i nuk është për production dhe nuk ngarkohet automatikisht në Supabase Cloud me `db push`.
+
 ## 5. Çfarë duhet të shohësh pas migrimit
 
 Në Database → Tables duhet të shfaqen `departments`, `categories`, `profiles`, `reports`, `report_status_history`, `report_comments`, `report_attachments`, `notifications` dhe `audit_logs`.
@@ -70,6 +72,8 @@ Në Database → Views duhet të shfaqen vetëm views publike të sanitizuara:
 - `public_report_status_history`.
 
 Në Storage duhet të ekzistojë bucket-i `report-evidence` dhe të jetë **private**. Storage kontrollohet me RLS në `storage.objects`; një bucket publik nuk është i pranueshëm për fotografitë e raportimeve.
+
+Pas një `supabase db reset` lokal, `/map` duhet të tregojë raportimet sintetike të seed-it. Nëse përdor Supabase Cloud, apliko vetëm migrations dhe ngarko demo data në projektin e zhvillimit sipas procedurës së kontrolluar të ekipit.
 
 ## 6. Rregulla që nuk thyhen
 

@@ -21,8 +21,8 @@ Next.js 16 (Vercel)
 
 - `app/(marketing)` — faqja publike dhe chrome publik.
 - `app/(auth)` — Login, Register, reset password dhe PKCE callback; nuk trashëgon navbar/footer publik.
-- `app/(workspace)` — route-t e mbrojtura, aktualisht `/account`.
-- `components/` — UI e ripërdorshme; pa SQL ose privilegje databaze.
+- `app/(workspace)` — route-t e mbrojtura `/account`, `/citizen/report` dhe `/citizen/reports`.
+- `components/` — UI e ripërdorshme, harta Leaflet dhe format; pa SQL ose privilegje databaze.
 - `lib/auth` — validimi i fjalëkalimit, mesazhet e kontrolluara dhe redirect-et e sigurta.
 - `lib/supabase` — klientë browser/server dhe rifreskimi i session-it.
 - `supabase/migrations` — burimi i vetëm autoritativ për skemën, RLS dhe Storage.
@@ -40,7 +40,7 @@ Next.js 16 (Vercel)
 ## Vendime të qëllimshme
 
 - Nuk përdorim NestJS në këtë fazë; do të shtonte një backend të dytë pa vlerë për fushëveprimin aktual.
-- Harta përdor OpenStreetMap + React Leaflet; geocoding dhe cache do të implementohen vetëm kur fillon moduli i hartës.
+- Harta publike dhe zgjedhja e lokacionit përdorin OpenStreetMap + React Leaflet; geocoding dhe cache nuk janë pjesë e Sprintit 5.
 - Të dhënat e demo-s janë deterministike, sintetike dhe nuk mbajnë adresa ose foto reale.
 - Next.js `16.2.11` është Active LTS. Turbopack është default për `next dev` dhe `next build`.
 

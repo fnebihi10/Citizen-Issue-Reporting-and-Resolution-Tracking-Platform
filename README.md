@@ -6,22 +6,24 @@ Titulli i punimit: **Zhvillimi i një platforme për raportimin, ndjekjen dhe zg
 
 ## Gjendja aktuale
 
-Sprintet 1–3 janë të implementuara dhe në rishikim final:
+Sprintet 1–5 janë të implementuara në nivel aplikacioni dhe në rishikim final:
 
 - arkitekturë, standarde të kodit dhe design system responsive;
 - Supabase me PostgreSQL/PostGIS, migrations, RLS, private Storage dhe views publike të sanitizuara;
 - autentikim me email/password, konfirmim email-i, PKCE callback, reset password, profil qytetari dhe mbrojtje të route-ve;
+- shell publik responsive me hartë publike, gjendje loading/empty/error dhe navigim për desktop/mobile;
+- krijim raportimi qytetar me kategori, validim, lokacion në hartë, fotografi prove në Storage privat dhe listën “raportimet e mia”;
 - Next.js 16 Active LTS, React 19, Turbopack default, TypeScript strict dhe ESLint flat config;
 - audit i dependency-ve pa vulnerabilitete të njohura në kohën e verifikimit.
 
-Nuk ka ende krijim raporti real; ai fillon në Sprintin 5.
+Migrations dhe RLS janë burimi autoritativ për databazën. Gjendja e projektit Supabase remote duhet të verifikohet me `supabase migration list` dhe `supabase db push --dry-run` para përdorimit me të dhëna reale.
 
 ## Stack
 
 - Next.js 16 + React 19 + TypeScript
 - Tailwind CSS dhe komponentë UI të ripërdorshëm
 - Supabase: Auth, PostgreSQL/PostGIS dhe Storage privat
-- OpenStreetMap + React Leaflet (implementohet me hartën në sprintet e ardhshme)
+- OpenStreetMap + React Leaflet për hartën publike dhe zgjedhjen e lokacionit në raportim
 - Vercel për deploy
 
 ## Nisja lokale
@@ -64,6 +66,8 @@ npx supabase migration list
 npx supabase db push --dry-run
 npx supabase db push
 ```
+
+Për zhvillim lokal me Supabase CLI, `supabase db reset` aplikon migrations dhe `supabase/seed.sql`; kjo krijon vetëm të dhëna sintetike demo. Mos e përdor seed-in në production.
 
 Lexo [udhëzuesin e Supabase](docs/supabase-setup.md) dhe [checklistën e autentikimit](docs/auth-setup.md) para testimit të parë.
 
