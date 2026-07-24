@@ -64,9 +64,9 @@ export default async function AccountPage() {
           <Card className="overflow-hidden border-blue-100 bg-blue-50/50 p-6 shadow-sm sm:p-7">
             <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-blue-600 shadow-sm"><FilePlus2 className="h-6 w-6" /></span>
             <h2 className="mt-5 text-xl font-black tracking-tight text-slate-950">Raportimet e mia</h2>
-            <p className="mt-3 text-sm leading-6 text-slate-600">Moduli për krijimin dhe ndjekjen e raportimeve do të shfaqet këtu pasi të aktivizohet procesi i qytetarit.</p>
+            <p className="mt-3 text-sm leading-6 text-slate-600">Krijo një raportim të ri ose ndiq statusin e çështjeve që ke dërguar më herët.</p>
             <div className="mt-6 rounded-xl border border-blue-100 bg-white/80 p-4 text-sm leading-6 text-blue-900"><strong>Privatësia ruhet:</strong> profili yt nuk shfaqet në hartën publike ose në faqet publike të raportimeve.</div>
-            <Link href="/" className="mt-6 inline-flex items-center gap-1.5 text-sm font-bold text-blue-700 hover:text-blue-800">Kthehu në faqen kryesore <ChevronRight className="h-4 w-4" /></Link>
+            <div className="mt-6 flex flex-wrap gap-3"><Link href="/citizen/report" className="inline-flex items-center gap-1.5 text-sm font-bold text-blue-700 hover:text-blue-800">Raporto problem <ChevronRight className="h-4 w-4" /></Link><Link href="/citizen/reports" className="inline-flex items-center gap-1.5 text-sm font-bold text-slate-600 hover:text-slate-900">Shiko raportimet <ChevronRight className="h-4 w-4" /></Link></div>
           </Card>
         </div>
       </div>
