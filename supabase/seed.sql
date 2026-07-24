@@ -27,7 +27,10 @@ values (
   'authenticated',
   'authenticated',
   'synthetic.citizen@example.test',
-  crypt('SyntheticDemoOnly!2026', gen_salt('bf')),
+  extensions.crypt(
+    'SyntheticDemoOnly!2026',
+    extensions.gen_salt('bf')
+  ),
   now(),
   '{"provider":"email","providers":["email"]}'::jsonb,
   '{"full_name":"Synthetic Demo Citizen"}'::jsonb,

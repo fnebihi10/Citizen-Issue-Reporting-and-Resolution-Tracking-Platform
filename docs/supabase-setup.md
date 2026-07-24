@@ -38,14 +38,15 @@ PostGIS është i nevojshëm për lokacionet, spatial index, filtrat e hartës d
 
 Migrations janë burimi autoritativ. Mos i krijo tabelat manualisht në Table Editor dhe mos e përdor migration-in e vjetër `01_schema_and_rls.sql`.
 
-Pasi të kesh Supabase CLI të instaluar:
+Supabase CLI është i fiksuar si development dependency në repository. Përdore
+përmes `npx`:
 
 ```bash
-supabase login
-supabase link --project-ref PROJECT_REF
-supabase migration list
-supabase db push --dry-run
-supabase db push
+npx supabase login
+npx supabase link --project-ref PROJECT_REF
+npx supabase migration list
+npx supabase db push --dry-run
+npx supabase db push
 ```
 
 Nëse CLI kërkon database password, përdor password-in që vendose gjatë krijimit të projektit. Migrations aplikohen sipas rendit:
@@ -59,7 +60,15 @@ Dokumentimi zyrtar: [Supabase database migrations](https://supabase.com/docs/gui
 
 Nëse nuk e ke CLI-në, për këtë projekt mund t’i ekzekutosh SQL files në SQL Editor në të njëjtin rend, por më pas duhet ta regjistrojmë gjendjen me CLI që migration history të mos dalë jashtë sinkronizimit.
 
-Për zhvillim lokal, `supabase/seed.sql` krijon një përdorues dhe disa raportime publike plotësisht sintetike, që harta të mos duket bosh gjatë demonstrimit. Seed-i nuk është për production dhe nuk ngarkohet automatikisht në Supabase Cloud me `db push`.
+Për zhvillim lokal, `supabase/seed.sql` krijon një përdorues dhe disa raportime
+publike plotësisht sintetike, që harta të mos duket bosh gjatë demonstrimit.
+Seed-i nuk është për production dhe nuk ngarkohet në Supabase Cloud nga një
+`db push` standard. Vetëm në projektin e lidhur `dev` ose `staging`, pasi
+`--dry-run` të kalojë, ngarkoje në mënyrë eksplicite:
+
+```bash
+npx supabase db push --include-seed
+```
 
 ## 5. Çfarë duhet të shohësh pas migrimit
 
@@ -73,12 +82,14 @@ Në Database → Views duhet të shfaqen vetëm views publike të sanitizuara:
 
 Në Storage duhet të ekzistojë bucket-i `report-evidence` dhe të jetë **private**. Storage kontrollohet me RLS në `storage.objects`; një bucket publik nuk është i pranueshëm për fotografitë e raportimeve.
 
-Pas një `supabase db reset` lokal, `/map` duhet të tregojë raportimet sintetike të seed-it. Nëse përdor Supabase Cloud, apliko vetëm migrations dhe ngarko demo data në projektin e zhvillimit sipas procedurës së kontrolluar të ekipit.
+Pas një `npx supabase db reset` lokal, `/map` duhet të tregojë raportimet
+sintetike të seed-it. Nëse përdor Supabase Cloud, përdor `--include-seed` vetëm
+në projektin e zhvillimit pasi të kesh verifikuar projektin e lidhur.
 
 ## 6. Rregulla që nuk thyhen
 
 - Mos e ndrysho rolin nga `raw_user_meta_data`; signup-i krijon gjithmonë `citizen`.
 - Mos bëj `db reset --linked`; ai fshin databazën remote dhe lejohet vetëm për një projekt disposable.
-- Mos e bëj `db push --include-seed` në production.
+- Mos e bëj `npx supabase db push --include-seed` në production.
 - Mos bëj ndryshime direkte në remote pa migration të commit-uar.
 - Para se të dërgosh rezultat, më jep vetëm `PROJECT_REF` ose konfirmo që `db push` kaloi. Mos dërgo asnjë secret.
