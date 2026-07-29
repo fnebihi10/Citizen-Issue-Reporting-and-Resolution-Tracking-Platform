@@ -7,7 +7,7 @@ import {
   RotateCcw,
   ShieldCheck,
 } from 'lucide-react';
-import { notFound, redirect } from 'next/navigation';
+import { notFound } from 'next/navigation';
 import {
   addCitizenComment,
   reopenCitizenReport,
@@ -19,6 +19,7 @@ import { ReportTimeline } from '@/components/reports/ReportTimeline';
 import { Card } from '@/components/ui/card';
 import { FlashMessage } from '@/components/ui/FlashMessage';
 import { SubmitButton } from '@/components/ui/SubmitButton';
+import { requireWorkspaceRequestContext } from '@/lib/auth/serverContext';
 import { createClient } from '@/lib/supabase/server';
 import { formatDate } from '@/lib/utils';
 import type {
@@ -46,73 +47,56 @@ export default async function CitizenReportDetailPage({
 }) {
   const { id } = await params;
   const flash = await searchParams;
+  const context = await requireWorkspaceRequestContext(
+    `/citizen/reports/${id}`,
+  );
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect(`/login?next=${encodeURIComponent(`/citizen/reports/${id}`)}`);
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .maybeSingle();
-  if (profile?.role !== 'citizen') redirect('/account?error=forbidden');
-
-  const { data: reportRow, error: reportError } = await supabase
-    .from('reports')
-    .select(
-      'id, report_number, title, description, category_id, department_id, assigned_official_id, citizen_id, status, priority, address_text, sla_due_at, is_public, public_title, public_summary, resolution_notes, rejected_reason, resolved_at, created_at, updated_at',
-    )
-    .eq('id', id)
-    .eq('citizen_id', user.id)
-    .maybeSingle();
-  if (reportError || !reportRow) notFound();
-  const report: CitizenReportListItem = reportRow;
 
   const [
-    { data: category },
-    { data: department },
+    { data: reportRow, error: reportError },
+    { data: categories },
+    { data: departments },
     { data: commentRows },
     { data: historyRows },
     { data: attachmentRows },
-    { count: unreadCount },
   ] = await Promise.all([
     supabase
-      .from('categories')
-      .select('name')
-      .eq('id', report.category_id)
+      .from('reports')
+      .select(
+        'id, report_number, title, description, category_id, department_id, assigned_official_id, citizen_id, status, priority, address_text, sla_due_at, is_public, public_title, public_summary, resolution_notes, rejected_reason, resolved_at, created_at, updated_at',
+      )
+      .eq('id', id)
+      .eq('citizen_id', context.userId)
       .maybeSingle(),
-    report.department_id
-      ? supabase
-          .from('departments')
-          .select('name')
-          .eq('id', report.department_id)
-          .maybeSingle()
-      : Promise.resolve({ data: null }),
+    supabase.from('categories').select('id, name'),
+    supabase.from('departments').select('id, name'),
     supabase
       .from('report_comments')
       .select('id, report_id, author_id, body, is_internal, created_at')
-      .eq('report_id', report.id)
+      .eq('report_id', id)
       .order('created_at', { ascending: true }),
     supabase
       .from('report_status_history')
       .select('id, report_id, previous_status, new_status, changed_by, note, created_at')
-      .eq('report_id', report.id)
+      .eq('report_id', id)
       .order('created_at', { ascending: true }),
     supabase
       .from('report_attachments')
       .select(
         'id, report_id, uploaded_by, bucket_id, object_path, kind, mime_type, size_bytes, is_internal, created_at',
       )
-      .eq('report_id', report.id)
+      .eq('report_id', id)
       .order('created_at', { ascending: true }),
-    supabase
-      .from('notifications')
-      .select('id', { count: 'exact', head: true })
-      .eq('recipient_id', user.id)
-      .is('read_at', null),
   ]);
+
+  if (reportError || !reportRow) notFound();
+  const report: CitizenReportListItem = reportRow;
+  const category = (categories ?? []).find(
+    (item) => item.id === report.category_id,
+  );
+  const department = (departments ?? []).find(
+    (item) => item.id === report.department_id,
+  );
 
   const attachments: Array<ReportAttachment & { signedUrl: string | null }> =
     await Promise.all(
@@ -126,7 +110,11 @@ export default async function CitizenReportDetailPage({
 
   return (
     <div className="min-h-screen">
-      <WorkspaceHeader role="citizen" unreadCount={unreadCount ?? 0} />
+      <WorkspaceHeader
+        role="citizen"
+        unreadCount={context.unreadCount}
+        sessionStartedAt={context.sessionStartedAt}
+      />
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
         <Link
           href="/citizen/reports"

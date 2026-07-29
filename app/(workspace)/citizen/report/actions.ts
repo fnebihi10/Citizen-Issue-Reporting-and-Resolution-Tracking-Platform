@@ -1,5 +1,6 @@
 'use server';
 
+import { requireWorkspaceRequestContext } from '@/lib/auth/serverContext';
 import { createClient } from '@/lib/supabase/server';
 import { validateCitizenReport, type ReportDraftInput } from '@/lib/reports/validation';
 
@@ -19,17 +20,10 @@ export async function createCitizenReport(input: ReportDraftInput): Promise<Crea
   const validationError = validateCitizenReport(input);
   if (validationError) return { ok: false, error: validationError };
 
+  const context = await requireWorkspaceRequestContext('/citizen/report');
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: 'Sesioni yt ka skaduar. Hyr përsëri për të dorëzuar raportimin.' };
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .maybeSingle();
-
-  if (profile?.role !== 'citizen') {
+  if (context.role !== 'citizen') {
     return { ok: false, error: 'Vetëm llogaritë me rolin qytetar mund të dorëzojnë raportime.' };
   }
 
@@ -48,7 +42,7 @@ export async function createCitizenReport(input: ReportDraftInput): Promise<Crea
       title: input.title.trim(),
       description: input.description.trim(),
       category_id: input.categoryId,
-      citizen_id: user.id,
+      citizen_id: context.userId,
       status: 'submitted',
       priority: 'normal',
       department_id: null,

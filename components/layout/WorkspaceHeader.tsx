@@ -2,13 +2,17 @@
 
 import Link from 'next/link';
 import {
+  Activity,
   Bell,
   ClipboardList,
   FilePlus2,
   Flag,
+  FolderCog,
   LayoutDashboard,
   Map,
   Menu,
+  ShieldCheck,
+  Users,
   UserRound,
 } from 'lucide-react';
 import { usePathname } from 'next/navigation';
@@ -24,9 +28,19 @@ const citizenNavigation = [
   { href: '/account', label: 'Llogaria', icon: UserRound, exact: false },
 ];
 
-const staffNavigation = [
+const officialNavigation = [
   { href: '/official', label: 'Përmbledhja', icon: LayoutDashboard, exact: true },
   { href: '/official/reports', label: 'Inbox-i zyrtar', icon: ClipboardList, exact: false },
+  { href: '/notifications', label: 'Njoftimet', icon: Bell, exact: false },
+  { href: '/account', label: 'Llogaria', icon: UserRound, exact: false },
+];
+
+const adminNavigation = [
+  { href: '/admin', label: 'Përmbledhja', icon: LayoutDashboard, exact: true },
+  { href: '/admin/users', label: 'Përdoruesit', icon: Users, exact: false },
+  { href: '/admin/structure', label: 'Struktura', icon: FolderCog, exact: false },
+  { href: '/admin/sla', label: 'SLA', icon: Activity, exact: false },
+  { href: '/admin/audit', label: 'Auditimi', icon: ShieldCheck, exact: false },
   { href: '/notifications', label: 'Njoftimet', icon: Bell, exact: false },
   { href: '/account', label: 'Llogaria', icon: UserRound, exact: false },
 ];
@@ -34,14 +48,27 @@ const staffNavigation = [
 export function WorkspaceHeader({
   role = 'citizen',
   unreadCount = 0,
+  sessionStartedAt,
 }: {
   role?: UserRole;
   unreadCount?: number;
+  sessionStartedAt: string;
 }) {
   const pathname = usePathname();
-  const isStaff = role === 'official' || role === 'admin';
-  const navigation = isStaff ? staffNavigation : citizenNavigation;
-  const homeHref = isStaff ? '/official' : '/citizen';
+  const isAdmin = role === 'admin';
+  const isOfficial = role === 'official';
+  const isStaff = isOfficial || isAdmin;
+  const navigation = isAdmin
+    ? adminNavigation
+    : isOfficial
+      ? officialNavigation
+      : citizenNavigation;
+  const homeHref = isAdmin ? '/admin' : isOfficial ? '/official' : '/citizen';
+  const areaLabel = isAdmin
+    ? 'Hapësira administrative'
+    : isOfficial
+      ? 'Hapësira zyrtare'
+      : 'Hapësira qytetare';
 
   function isActive(href: string, exact: boolean) {
     return exact ? pathname === href : pathname === href || pathname.startsWith(`${href}/`);
@@ -49,13 +76,19 @@ export function WorkspaceHeader({
 
   return (
     <>
-      <SessionExpiryGuard />
+      <SessionExpiryGuard sessionStartedAt={sessionStartedAt} />
       <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/90 backdrop-blur-xl">
         <div className="mx-auto flex min-h-[72px] max-w-6xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
         <Link
           href={homeHref}
           className="flex items-center gap-3"
-          aria-label={isStaff ? 'Hap inbox-in zyrtar' : 'Hap panelin qytetar'}
+          aria-label={
+            isAdmin
+              ? 'Hap panelin administrativ'
+              : isStaff
+                ? 'Hap panelin zyrtar'
+                : 'Hap panelin qytetar'
+          }
         >
           <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-950 text-white">
             <Flag className="h-5 w-5" aria-hidden="true" />
@@ -65,14 +98,14 @@ export function WorkspaceHeader({
               Raporto Qytetin
             </span>
             <span className="block text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500">
-              {isStaff ? 'Hapësira zyrtare' : 'Hapësira qytetare'}
+              {areaLabel}
             </span>
           </span>
         </Link>
 
         <nav
           className="hidden items-center gap-0.5 lg:flex"
-          aria-label={isStaff ? 'Navigimi i hapësirës zyrtare' : 'Navigimi i hapësirës qytetare'}
+          aria-label={`Navigimi i ${areaLabel.toLocaleLowerCase('sq-AL')}`}
         >
           {navigation.map(({ href, label, icon: Icon, exact }) => {
             const active = isActive(href, exact);

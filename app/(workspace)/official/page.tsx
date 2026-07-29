@@ -21,6 +21,7 @@ import {
   getOfficialAttentionReports,
   summarizeOfficialWorkload,
 } from '@/lib/workflow/officialDashboard';
+import { getWorkspaceRequestContext } from '@/lib/auth/serverContext';
 import { createClient } from '@/lib/supabase/server';
 import { formatDate } from '@/lib/utils';
 import type {
@@ -54,27 +55,24 @@ function firstName(fullName: string | null | undefined) {
 }
 
 export default async function OfficialDashboardPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect('/login?next=/official');
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('full_name, role, department_id')
-    .eq('id', user.id)
-    .maybeSingle();
-  if (!profile || (profile.role !== 'official' && profile.role !== 'admin')) {
+  const context = await getWorkspaceRequestContext();
+  if (!context) redirect('/login?next=/official');
+  if (context.role !== 'official' && context.role !== 'admin') {
     redirect('/account?error=forbidden');
   }
+
+  const supabase = await createClient();
+  const profile = {
+    full_name: context.fullName,
+    role: context.role,
+    department_id: context.departmentId,
+  };
 
   const [
     { data: reportRows, error: reportsError },
     { data: categories },
     { data: departments },
     { data: notificationRows },
-    { count: unreadCount },
   ] = await Promise.all([
     supabase
       .from('reports')
@@ -86,22 +84,17 @@ export default async function OfficialDashboardPage() {
     supabase
       .from('notifications')
       .select('id, recipient_id, report_id, type, title, message, read_at, created_at')
-      .eq('recipient_id', user.id)
+      .eq('recipient_id', context.userId)
       .is('read_at', null)
       .order('created_at', { ascending: false })
       .limit(3),
-    supabase
-      .from('notifications')
-      .select('id', { count: 'exact', head: true })
-      .eq('recipient_id', user.id)
-      .is('read_at', null),
   ]);
 
   const reports: CitizenReportListItem[] = reportRows ?? [];
   const notifications: Notification[] = notificationRows ?? [];
-  const summary = summarizeOfficialWorkload(reports, user.id);
-  const attentionReports = getOfficialAttentionReports(reports, user.id);
-  const assignedReports = getOfficialAssignedReports(reports, user.id);
+  const summary = summarizeOfficialWorkload(reports, context.userId);
+  const attentionReports = getOfficialAttentionReports(reports, context.userId);
+  const assignedReports = getOfficialAssignedReports(reports, context.userId);
   const categoryNames = new Map(
     (categories ?? []).map((category) => [category.id, category.name]),
   );
@@ -117,7 +110,11 @@ export default async function OfficialDashboardPage() {
 
   return (
     <div className="min-h-screen">
-      <WorkspaceHeader role={profile.role} unreadCount={unreadCount ?? 0} />
+      <WorkspaceHeader
+        role={profile.role}
+        unreadCount={context.unreadCount}
+        sessionStartedAt={context.sessionStartedAt}
+      />
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
         <section className="overflow-hidden rounded-[1.75rem] bg-slate-950 px-6 py-7 text-white shadow-[0_28px_70px_-36px_rgba(15,23,42,0.75)] sm:px-8 sm:py-9 lg:px-10">
           <div className="flex flex-col gap-7 lg:flex-row lg:items-end lg:justify-between">

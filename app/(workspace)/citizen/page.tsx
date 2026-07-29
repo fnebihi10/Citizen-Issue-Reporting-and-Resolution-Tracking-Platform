@@ -11,7 +11,6 @@ import {
   ShieldCheck,
   Sparkles,
 } from 'lucide-react';
-import { redirect } from 'next/navigation';
 import { WorkspaceHeader } from '@/components/layout/WorkspaceHeader';
 import { ReportStatusBadge } from '@/components/reports/ReportStatusBadge';
 import { buttonVariantsClass } from '@/components/ui/button';
@@ -21,6 +20,7 @@ import {
   getNearestActiveReport,
   summarizeCitizenReports,
 } from '@/lib/reports/citizenDashboard';
+import { requireWorkspaceRequestContext } from '@/lib/auth/serverContext';
 import { createClient } from '@/lib/supabase/server';
 import { formatDate } from '@/lib/utils';
 import type {
@@ -34,46 +34,29 @@ const reportColumns =
   'id, report_number, title, description, category_id, department_id, assigned_official_id, citizen_id, status, priority, address_text, sla_due_at, is_public, public_title, public_summary, resolution_notes, rejected_reason, resolved_at, created_at, updated_at';
 
 export default async function CitizenDashboardPage() {
+  const context = await requireWorkspaceRequestContext('/citizen');
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect('/login?next=/citizen');
 
   const [
-    { data: profile },
     { data: reportRows, error: reportsError },
     { data: categories },
     { data: notificationRows },
-    { count: unreadCount },
   ] = await Promise.all([
-    supabase
-      .from('profiles')
-      .select('full_name, role')
-      .eq('id', user.id)
-      .maybeSingle(),
     supabase
       .from('reports')
       .select(reportColumns)
-      .eq('citizen_id', user.id)
+      .eq('citizen_id', context.userId)
       .order('updated_at', { ascending: false })
       .limit(200),
     supabase.from('categories').select('id, name'),
     supabase
       .from('notifications')
       .select('id, recipient_id, report_id, type, title, message, read_at, created_at')
-      .eq('recipient_id', user.id)
+      .eq('recipient_id', context.userId)
       .is('read_at', null)
       .order('created_at', { ascending: false })
       .limit(3),
-    supabase
-      .from('notifications')
-      .select('id', { count: 'exact', head: true })
-      .eq('recipient_id', user.id)
-      .is('read_at', null),
   ]);
-
-  if (profile?.role !== 'citizen') redirect('/account?error=forbidden');
 
   const reports: CitizenReportListItem[] = reportRows ?? [];
   const notifications: Notification[] = notificationRows ?? [];
@@ -82,11 +65,15 @@ export default async function CitizenDashboardPage() {
   const categoryNames = new Map(
     (categories ?? []).map((category) => [category.id, category.name]),
   );
-  const firstName = getCitizenFirstName(profile.full_name);
+  const firstName = getCitizenFirstName(context.fullName);
 
   return (
     <div className="min-h-screen">
-      <WorkspaceHeader role="citizen" unreadCount={unreadCount ?? 0} />
+      <WorkspaceHeader
+        role="citizen"
+        unreadCount={context.unreadCount}
+        sessionStartedAt={context.sessionStartedAt}
+      />
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
         <section className="relative overflow-hidden rounded-[1.75rem] bg-slate-950 px-6 py-7 text-white shadow-[0_28px_70px_-36px_rgba(15,23,42,0.75)] sm:px-8 sm:py-9 lg:px-10">
           <div
@@ -167,7 +154,7 @@ export default async function CitizenDashboardPage() {
           />
           <DashboardMetric
             label="Të palexuara"
-            value={unreadCount ?? 0}
+            value={context.unreadCount}
             detail="njoftime të reja"
             icon={Bell}
             iconClassName="bg-amber-50 text-amber-700"

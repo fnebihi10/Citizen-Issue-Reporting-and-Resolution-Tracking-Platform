@@ -1,7 +1,7 @@
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
 import {
   AlertTriangle,
+  Activity,
   ArrowRight,
   Bell,
   CalendarDays,
@@ -16,12 +16,14 @@ import {
   Phone,
   ShieldCheck,
   UserRound,
+  Users,
 } from 'lucide-react';
 import { WorkspaceHeader } from '@/components/layout/WorkspaceHeader';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariantsClass } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { getRoleHomePath } from '@/lib/auth/redirect';
+import { requireWorkspaceRequestContext } from '@/lib/auth/serverContext';
 import { createClient } from '@/lib/supabase/server';
 import { formatDate } from '@/lib/utils';
 import type { UserRole } from '@/types/database';
@@ -51,36 +53,37 @@ function getInitials(fullName: string) {
 export default async function AccountPage({ searchParams }: AccountPageProps) {
   const params = await searchParams;
   const accessDenied = params.error === 'forbidden';
+  const context = await requireWorkspaceRequestContext('/account');
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) redirect('/login?next=/account');
-
-  const [{ data: profile }, { count: unreadCount }] = await Promise.all([
+  const [
+    {
+      data: { user },
+    },
+    { data: profile },
+  ] = await Promise.all([
+    supabase.auth.getUser(),
     supabase
       .from('profiles')
-      .select('full_name, email, phone, role, created_at')
-      .eq('id', user.id)
+      .select('email, phone, created_at')
+      .eq('id', context.userId)
       .maybeSingle(),
-    supabase
-      .from('notifications')
-      .select('id', { count: 'exact', head: true })
-      .eq('recipient_id', user.id)
-      .is('read_at', null),
   ]);
 
-  const role: UserRole = profile?.role ?? 'citizen';
-  const fullName = profile?.full_name?.trim() || 'Qytetar';
-  const email = profile?.email ?? user.email ?? 'Nuk është vendosur';
+  const role: UserRole = context.role;
+  const fullName = context.fullName.trim() || 'Qytetar';
+  const email = profile?.email ?? user?.email ?? 'Nuk është vendosur';
   const roleHome = getRoleHomePath(role);
   const isCitizen = role === 'citizen';
-  const emailVerified = Boolean(user.email_confirmed_at);
+  const isAdmin = role === 'admin';
+  const emailVerified = Boolean(user?.email_confirmed_at);
 
   return (
     <div className="min-h-screen">
-      <WorkspaceHeader role={role} unreadCount={unreadCount ?? 0} />
+      <WorkspaceHeader
+        role={role}
+        unreadCount={context.unreadCount}
+        sessionStartedAt={context.sessionStartedAt}
+      />
 
       <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
         {accessDenied ? (
@@ -118,12 +121,16 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
               className: 'w-full shrink-0 sm:w-auto',
             })}
           >
-            {isCitizen ? (
+            {isCitizen || isAdmin ? (
               <LayoutDashboard className="h-4 w-4" aria-hidden="true" />
             ) : (
               <ClipboardList className="h-4 w-4" aria-hidden="true" />
             )}
-            {isCitizen ? 'Kthehu te paneli' : 'Hap inbox-in'}
+            {isAdmin
+              ? 'Kthehu te administrimi'
+              : isCitizen
+                ? 'Kthehu te paneli'
+                : 'Hap inbox-in'}
           </Link>
         </header>
 
@@ -168,7 +175,7 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
                 <ProfileFact
                   icon={CalendarDays}
                   label="Anëtar që nga"
-                  value={formatDate(profile?.created_at ?? user.created_at)}
+                  value={formatDate(profile?.created_at ?? context.sessionStartedAt)}
                   tone="info"
                 />
               </div>
@@ -307,7 +314,29 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
                     className="md:col-span-2 xl:col-span-1"
                   />
                 </>
-            ) : (
+              ) : isAdmin ? (
+                <>
+                  <AccountShortcut
+                    href="/admin"
+                    icon={LayoutDashboard}
+                    title="Paneli administrativ"
+                    description="Përmbledhja e sistemit"
+                  />
+                  <AccountShortcut
+                    href="/admin/users"
+                    icon={Users}
+                    title="Përdoruesit"
+                    description="Rolet dhe departamentet"
+                  />
+                  <AccountShortcut
+                    href="/admin/sla"
+                    icon={Activity}
+                    title="Afatet SLA"
+                    description="Rastet që kërkojnë vëmendje"
+                    className="md:col-span-2 xl:col-span-1"
+                  />
+                </>
+              ) : (
               <>
                 <AccountShortcut
                   href="/official"

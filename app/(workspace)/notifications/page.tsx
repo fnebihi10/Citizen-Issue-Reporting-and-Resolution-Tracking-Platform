@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import { Bell, Check, CheckCheck, ExternalLink } from 'lucide-react';
-import { redirect } from 'next/navigation';
 import {
   markAllNotificationsRead,
   markNotificationRead,
@@ -9,40 +8,37 @@ import { WorkspaceHeader } from '@/components/layout/WorkspaceHeader';
 import { EmptyState, ErrorState } from '@/components/ui/FeedbackState';
 import { SubmitButton } from '@/components/ui/SubmitButton';
 import { Card } from '@/components/ui/card';
+import { requireWorkspaceRequestContext } from '@/lib/auth/serverContext';
 import { createClient } from '@/lib/supabase/server';
 import { formatDate } from '@/lib/utils';
-import type { Notification, UserRole } from '@/types/database';
+import type { Notification } from '@/types/database';
 
 export const dynamic = 'force-dynamic';
 
 export default async function NotificationsPage() {
+  const context = await requireWorkspaceRequestContext('/notifications');
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect('/login?next=/notifications');
 
-  const [{ data: profile }, { data, error }] = await Promise.all([
-    supabase.from('profiles').select('role').eq('id', user.id).maybeSingle(),
-    supabase
-      .from('notifications')
-      .select('id, recipient_id, report_id, type, title, message, read_at, created_at')
-      .eq('recipient_id', user.id)
-      .order('created_at', { ascending: false })
-      .limit(100),
-  ]);
+  const { data, error } = await supabase
+    .from('notifications')
+    .select('id, recipient_id, report_id, type, title, message, read_at, created_at')
+    .eq('recipient_id', context.userId)
+    .order('created_at', { ascending: false })
+    .limit(100);
 
-  const role: UserRole = profile?.role ?? 'citizen';
   const notifications: Notification[] = data ?? [];
-  const unreadCount = notifications.filter((notification) => !notification.read_at).length;
   const reportBase =
-    role === 'official' || role === 'admin'
+    context.role === 'official' || context.role === 'admin'
       ? '/official/reports'
       : '/citizen/reports';
 
   return (
     <div className="min-h-screen">
-      <WorkspaceHeader role={role} unreadCount={unreadCount} />
+      <WorkspaceHeader
+        role={context.role}
+        unreadCount={context.unreadCount}
+        sessionStartedAt={context.sessionStartedAt}
+      />
       <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
@@ -56,7 +52,7 @@ export default async function NotificationsPage() {
               Ndryshimet e statusit dhe komentet e reja shfaqen këtu.
             </p>
           </div>
-          {unreadCount > 0 ? (
+          {context.unreadCount > 0 ? (
             <form action={markAllNotificationsRead}>
               <SubmitButton variant="secondary" pendingLabel="Duke shënuar...">
                 <CheckCheck className="h-4 w-4" aria-hidden="true" />

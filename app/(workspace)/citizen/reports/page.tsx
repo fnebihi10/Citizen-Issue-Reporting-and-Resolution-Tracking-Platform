@@ -10,7 +10,6 @@ import {
   ShieldCheck,
   SlidersHorizontal,
 } from 'lucide-react';
-import { redirect } from 'next/navigation';
 import { WorkspaceHeader } from '@/components/layout/WorkspaceHeader';
 import { ReportStatusBadge } from '@/components/reports/ReportStatusBadge';
 import { EmptyState, ErrorState } from '@/components/ui/FeedbackState';
@@ -21,6 +20,7 @@ import {
   summarizeCitizenReports,
   type CitizenReportView,
 } from '@/lib/reports/citizenDashboard';
+import { requireWorkspaceRequestContext } from '@/lib/auth/serverContext';
 import { createClient } from '@/lib/supabase/server';
 import { formatDate } from '@/lib/utils';
 import type { CitizenReportListItem } from '@/types/database';
@@ -65,38 +65,25 @@ export default async function CitizenReportsPage({
   }>;
 }) {
   const params = await searchParams;
+  const context = await requireWorkspaceRequestContext('/citizen/reports');
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect('/login?next=/citizen/reports');
 
   const requestedView = firstValue(params.view);
   const view = isCitizenReportView(requestedView) ? requestedView : 'all';
   const search = firstValue(params.q)?.trim().slice(0, 80) ?? '';
 
   const [
-    { data: profile },
     { data: reportRows, error },
     { data: categories },
-    { count: unreadCount },
   ] = await Promise.all([
-    supabase.from('profiles').select('role').eq('id', user.id).maybeSingle(),
     supabase
       .from('reports')
       .select(reportColumns)
-      .eq('citizen_id', user.id)
+      .eq('citizen_id', context.userId)
       .order('created_at', { ascending: false })
       .limit(200),
     supabase.from('categories').select('id, name'),
-    supabase
-      .from('notifications')
-      .select('id', { count: 'exact', head: true })
-      .eq('recipient_id', user.id)
-      .is('read_at', null),
   ]);
-
-  if (profile?.role !== 'citizen') redirect('/account?error=forbidden');
 
   const reports: CitizenReportListItem[] = reportRows ?? [];
   const visibleReports = filterCitizenReports(reports, view, search);
@@ -114,7 +101,11 @@ export default async function CitizenReportsPage({
 
   return (
     <div className="min-h-screen">
-      <WorkspaceHeader role="citizen" unreadCount={unreadCount ?? 0} />
+      <WorkspaceHeader
+        role="citizen"
+        unreadCount={context.unreadCount}
+        sessionStartedAt={context.sessionStartedAt}
+      />
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div>

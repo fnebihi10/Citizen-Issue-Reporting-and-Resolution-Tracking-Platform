@@ -29,6 +29,7 @@ if (process.env.NODE_ENV === 'production') {
 const nextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
+  allowedDevOrigins: ['192.168.1.119'],
   async headers() {
     return [
       {

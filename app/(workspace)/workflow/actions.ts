@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
+import { getWorkspaceRequestContext } from '@/lib/auth/serverContext';
 import {
   isUuid,
   reportPriorities,
@@ -58,20 +59,18 @@ function friendlyWorkflowError(message?: string) {
 }
 
 async function authenticatedProfile() {
+  const context = await getWorkspaceRequestContext();
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  if (!context) return { supabase, user: null, profile: null };
 
-  if (!user) return { supabase, user: null, profile: null };
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role, department_id')
-    .eq('id', user.id)
-    .maybeSingle();
-
-  return { supabase, user, profile };
+  return {
+    supabase,
+    user: { id: context.userId },
+    profile: {
+      role: context.role,
+      department_id: context.departmentId,
+    },
+  };
 }
 
 export async function transitionOfficialReport(formData: FormData) {

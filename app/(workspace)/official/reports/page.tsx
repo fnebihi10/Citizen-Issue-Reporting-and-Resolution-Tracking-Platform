@@ -11,6 +11,7 @@ import { ReportStatusBadge } from '@/components/reports/ReportStatusBadge';
 import { EmptyState, ErrorState } from '@/components/ui/FeedbackState';
 import { buttonVariantsClass } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { getWorkspaceRequestContext } from '@/lib/auth/serverContext';
 import { createClient } from '@/lib/supabase/server';
 import { formatDate } from '@/lib/utils';
 import type {
@@ -53,20 +54,13 @@ export default async function OfficialReportsPage({
   }>;
 }) {
   const params = await searchParams;
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect('/login?next=/official/reports');
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role, department_id')
-    .eq('id', user.id)
-    .maybeSingle();
-  if (!profile || (profile.role !== 'official' && profile.role !== 'admin')) {
+  const context = await getWorkspaceRequestContext();
+  if (!context) redirect('/login?next=/official/reports');
+  if (context.role !== 'official' && context.role !== 'admin') {
     redirect('/account?error=forbidden');
   }
+
+  const supabase = await createClient();
 
   const status = firstValue(params.status);
   const priority = firstValue(params.priority);
@@ -89,7 +83,7 @@ export default async function OfficialReportsPage({
 
   if (validStatus) reportsQuery = reportsQuery.eq('status', validStatus);
   if (validPriority) reportsQuery = reportsQuery.eq('priority', validPriority);
-  if (profile.role === 'admin' && department) {
+  if (context.role === 'admin' && department) {
     reportsQuery = reportsQuery.eq('department_id', department);
   }
   if (search) reportsQuery = reportsQuery.ilike('title', `%${search}%`);
@@ -98,16 +92,10 @@ export default async function OfficialReportsPage({
     { data: reportRows, error: reportsError },
     { data: categories },
     { data: departments },
-    { count: unreadCount },
   ] = await Promise.all([
     reportsQuery,
     supabase.from('categories').select('id, name').order('name'),
     supabase.from('departments').select('id, name').order('name'),
-    supabase
-      .from('notifications')
-      .select('id', { count: 'exact', head: true })
-      .eq('recipient_id', user.id)
-      .is('read_at', null),
   ]);
 
   const reports: CitizenReportListItem[] = reportRows ?? [];
@@ -118,7 +106,11 @@ export default async function OfficialReportsPage({
 
   return (
     <div className="min-h-screen">
-      <WorkspaceHeader role={profile.role} unreadCount={unreadCount ?? 0} />
+      <WorkspaceHeader
+        role={context.role}
+        unreadCount={context.unreadCount}
+        sessionStartedAt={context.sessionStartedAt}
+      />
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
@@ -190,7 +182,7 @@ export default async function OfficialReportsPage({
             <Filter className="h-4 w-4" aria-hidden="true" />
             Filtro
           </button>
-          {profile.role === 'admin' ? (
+          {context.role === 'admin' ? (
             <label className="md:col-start-3">
               <span className="sr-only">Filtro departamentin</span>
               <select

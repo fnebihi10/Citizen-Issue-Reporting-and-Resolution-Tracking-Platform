@@ -15,6 +15,7 @@ import { ReportStatusBadge } from '@/components/reports/ReportStatusBadge';
 import { ReportTimeline } from '@/components/reports/ReportTimeline';
 import { Card } from '@/components/ui/card';
 import { FlashMessage } from '@/components/ui/FlashMessage';
+import { getWorkspaceRequestContext } from '@/lib/auth/serverContext';
 import { createClient } from '@/lib/supabase/server';
 import { formatDate } from '@/lib/utils';
 import type {
@@ -42,57 +43,36 @@ export default async function OfficialReportDetailPage({
 }) {
   const { id } = await params;
   const flash = await searchParams;
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect(`/login?next=${encodeURIComponent(`/official/reports/${id}`)}`);
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role, department_id')
-    .eq('id', user.id)
-    .maybeSingle();
-  if (!profile || (profile.role !== 'official' && profile.role !== 'admin')) {
+  const context = await getWorkspaceRequestContext();
+  if (!context) {
+    redirect(`/login?next=${encodeURIComponent(`/official/reports/${id}`)}`);
+  }
+  if (context.role !== 'official' && context.role !== 'admin') {
     redirect('/account?error=forbidden');
   }
 
-  const { data: reportRow, error: reportError } = await supabase
-    .from('reports')
-    .select(
-      'id, report_number, title, description, category_id, department_id, assigned_official_id, citizen_id, status, priority, address_text, sla_due_at, is_public, public_title, public_summary, resolution_notes, rejected_reason, resolved_at, created_at, updated_at',
-    )
-    .eq('id', id)
-    .maybeSingle();
-  if (reportError || !reportRow) notFound();
-  const report: CitizenReportListItem = reportRow;
+  const supabase = await createClient();
 
   const [
-    { data: category },
-    { data: department },
+    { data: reportRow, error: reportError },
+    { data: categories },
     { data: departments },
     { data: staff },
     { data: commentRows },
     { data: historyRows },
     { data: attachmentRows },
-    { count: unreadCount },
   ] = await Promise.all([
     supabase
-      .from('categories')
-      .select('name')
-      .eq('id', report.category_id)
+      .from('reports')
+      .select(
+        'id, report_number, title, description, category_id, department_id, assigned_official_id, citizen_id, status, priority, address_text, sla_due_at, is_public, public_title, public_summary, resolution_notes, rejected_reason, resolved_at, created_at, updated_at',
+      )
+      .eq('id', id)
       .maybeSingle(),
-    report.department_id
-      ? supabase
-          .from('departments')
-          .select('name')
-          .eq('id', report.department_id)
-          .maybeSingle()
-      : Promise.resolve({ data: null }),
+    supabase.from('categories').select('id, name'),
     supabase
       .from('departments')
-      .select('id, name')
-      .eq('is_active', true)
+      .select('id, name, is_active')
       .order('name'),
     supabase
       .from('profiles')
@@ -102,26 +82,32 @@ export default async function OfficialReportDetailPage({
     supabase
       .from('report_comments')
       .select('id, report_id, author_id, body, is_internal, created_at')
-      .eq('report_id', report.id)
+      .eq('report_id', id)
       .order('created_at', { ascending: true }),
     supabase
       .from('report_status_history')
       .select('id, report_id, previous_status, new_status, changed_by, note, created_at')
-      .eq('report_id', report.id)
+      .eq('report_id', id)
       .order('created_at', { ascending: true }),
     supabase
       .from('report_attachments')
       .select(
         'id, report_id, uploaded_by, bucket_id, object_path, kind, mime_type, size_bytes, is_internal, created_at',
       )
-      .eq('report_id', report.id)
+      .eq('report_id', id)
       .order('created_at', { ascending: true }),
-    supabase
-      .from('notifications')
-      .select('id', { count: 'exact', head: true })
-      .eq('recipient_id', user.id)
-      .is('read_at', null),
   ]);
+  if (reportError || !reportRow) notFound();
+  const report: CitizenReportListItem = reportRow;
+  const category = (categories ?? []).find(
+    (item) => item.id === report.category_id,
+  );
+  const department = (departments ?? []).find(
+    (item) => item.id === report.department_id,
+  );
+  const activeDepartments = (departments ?? []).filter(
+    (item) => item.is_active,
+  );
 
   const attachments: Array<ReportAttachment & { signedUrl: string | null }> =
     await Promise.all(
@@ -135,7 +121,11 @@ export default async function OfficialReportDetailPage({
 
   return (
     <div className="min-h-screen">
-      <WorkspaceHeader role={profile.role} unreadCount={unreadCount ?? 0} />
+      <WorkspaceHeader
+        role={context.role}
+        unreadCount={context.unreadCount}
+        sessionStartedAt={context.sessionStartedAt}
+      />
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
         <Link
           href="/official/reports"
@@ -281,11 +271,11 @@ export default async function OfficialReportDetailPage({
                 <OfficialWorkflowPanel
                   report={report}
                   actor={{
-                    id: user.id,
-                    role: profile.role,
-                    departmentId: profile.department_id,
+                    id: context.userId,
+                    role: context.role,
+                    departmentId: context.departmentId,
                   }}
-                  departments={departments ?? []}
+                  departments={activeDepartments}
                   staff={staff ?? []}
                 />
               </div>

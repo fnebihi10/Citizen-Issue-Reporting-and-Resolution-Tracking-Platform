@@ -5,7 +5,11 @@ import { usePathname, useRouter } from 'next/navigation';
 import { getSessionRemainingMs } from '@/lib/auth/sessionExpiry';
 import { createClient } from '@/lib/supabase/client';
 
-export function SessionExpiryGuard() {
+export function SessionExpiryGuard({
+  sessionStartedAt,
+}: {
+  sessionStartedAt: string;
+}) {
   const pathname = usePathname();
   const router = useRouter();
 
@@ -25,15 +29,7 @@ export function SessionExpiryGuard() {
     }
 
     async function scheduleExpiry() {
-      const supabase = createClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (cancelled || !user) return;
-
-      const remainingMs = getSessionRemainingMs(
-        user.last_sign_in_at ?? user.created_at,
-      );
+      const remainingMs = getSessionRemainingMs(sessionStartedAt);
       if (remainingMs === 0) {
         await expireCurrentSession();
         return;
@@ -50,7 +46,7 @@ export function SessionExpiryGuard() {
       cancelled = true;
       if (timeoutId !== undefined) window.clearTimeout(timeoutId);
     };
-  }, [pathname, router]);
+  }, [pathname, router, sessionStartedAt]);
 
   return null;
 }
