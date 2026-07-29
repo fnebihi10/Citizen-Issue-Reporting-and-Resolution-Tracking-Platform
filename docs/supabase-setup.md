@@ -80,7 +80,12 @@ Nëse CLI kërkon database password, përdor password-in që vendose gjatë krij
 11. `20260724235000_enforce_citizen_report_role.sql` — kontrolli i rolit
     autoritativ edhe për insert-et direkte të raportit qytetar.
 12. `20260729143000_sprint6_official_workflow.sql` — workflow atomik i stafit,
-    komentet/rihapja e kontrolluar dhe njoftimet server-side.
+    komentet/rihapja e kontrolluar dhe njoftimet server-side;
+13. `20260729200000_sprint7_admin_governance.sql` — administrimi i roleve,
+    strukturës, SLA-së, auditimit dhe eksporteve të kontrolluara;
+14. `20260729213000_request_context_performance.sql` — konteksti i mbrojtur i
+    kërkesës që bashkon kontrollin e session-it, profilit dhe njoftimeve në një
+    RPC për route-t e workspace-it.
 
 Dokumentimi zyrtar: [Supabase database migrations](https://supabase.com/docs/guides/deployment/database-migrations).
 
@@ -135,9 +140,10 @@ set role = 'official',
 where email = 'OFFICIAL_LOGIN_EMAIL';
 ```
 
-Mos e ndrysho rolin te `auth.users.raw_user_meta_data`. Menaxhimi i roleve nga
-ndërfaqja administrative i përket Sprintit 7; SQL-ja e mësipërme përdoret vetëm
-për bootstrap-in e administratorit të parë në `dev`.
+Mos e ndrysho rolin te `auth.users.raw_user_meta_data`. Pas bootstrap-it të
+administratorit të parë në `dev`, të gjitha ndryshimet e tjera të roleve dhe
+departamenteve bëhen te `/admin/users`, ku RLS dhe audit trigger-at mbeten
+kufiri autoritativ.
 
 ## 5. Çfarë duhet të shohësh pas migrimit
 

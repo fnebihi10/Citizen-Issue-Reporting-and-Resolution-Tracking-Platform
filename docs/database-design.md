@@ -1,4 +1,4 @@
-# Modeli i databazës — Sprintet 2–6
+# Modeli i databazës — Sprintet 2–7
 
 ## Entitetet
 
@@ -23,6 +23,22 @@ reports    1──* notifications
 - `report_status_history` dhe `audit_logs` krijohen nga trigger-a server-side, jo nga browser-i.
 - `report_comments` janë immutable: një korrigjim ruhet si koment i ri, jo si
   ndryshim i historikut ekzistues.
+
+## Administrimi dhe auditimi
+
+- RLS lejon vetëm rolin `admin` të ndryshojë `profiles`, `departments` dhe
+  `categories`; regjistrimi publik vazhdon të krijojë vetëm `citizen`.
+- Email-i dhe ID-ja e profilit mbeten të menaxhuara nga Supabase Auth dhe nuk
+  ndryshohen nga Data API, as nga formulari administrativ.
+- Një profil `official` kërkon departament aktiv. Administratori aktual nuk
+  mund ta ulë vetë rolin, ndërsa një departament me zyrtarë të caktuar nuk
+  mund të çaktivizohet para ricaktimit të tyre.
+- Trigger-at e Sprintit 7 regjistrojnë ndryshimet e roleve/departamenteve,
+  konfigurimit të departamenteve dhe kategorive/SLA-ve në `audit_logs`.
+- `record_admin_export()` regjistron formatin, filtrat dhe numrin e rreshtave
+  para se route-i të dorëzojë skedarin CSV/JSON.
+- Eksporti ndërtohet nga fusha operative dhe përjashton `citizen_id`,
+  përshkrimin privat, adresën, kontaktet dhe koordinatat.
 
 ## Statuset e lejuara
 

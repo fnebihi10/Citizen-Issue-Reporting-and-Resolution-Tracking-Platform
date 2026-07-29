@@ -32,8 +32,9 @@ Për testim lokal, këto vlera janë pasqyruar edhe te [`supabase/config.toml`](
 - `/forgot-password` — dërgon kërkesë për reset pa zbuluar nëse email-i ekziston.
 - `/update-password` — kërkon session të vlefshëm dhe vendos fjalëkalimin e ri.
 - `/account` — lexon profilin në server; route-i është i mbrojtur edhe me Proxy edhe me kontroll server-side.
-- Hyrja pa një destinacion `next` e dërgon qytetarin te `/citizen` dhe stafin
-  te `/official`; një destinacion i brendshëm eksplicit ruhet.
+- Hyrja pa një destinacion `next` e dërgon qytetarin te `/citizen`, zyrtarin
+  te `/official` dhe administratorin te `/admin`; një destinacion i brendshëm
+  eksplicit ruhet.
 - Çdo session i workspace-it ka jetëgjatësi absolute një orë nga
   `last_sign_in_at`. Proxy e zbaton para çdo route-i të mbrojtur, ndërsa
   header-i mban timer-in aktiv edhe kur faqja mbetet e hapur.
@@ -57,7 +58,9 @@ aplikacionit.
 
 ## Rolet
 
-Signup-i krijon gjithmonë `citizen` në trigger-in e databazës. `official` dhe `admin` nuk mund të caktohen nga browser-i; do të menaxhohen në panelin administrativ në Sprintin 7.
+Signup-i krijon gjithmonë `citizen` në trigger-in e databazës. `official` dhe
+`admin` nuk mund të zgjidhen gjatë regjistrimit; caktohen nga një administrator
+i autentikuar te `/admin/users`, nën RLS dhe audit trigger-at e databazës.
 
 ## Checklistë para testit të parë
 

@@ -1,7 +1,7 @@
 # Diagramet autoritative
 
 Diagramet Mermaid më poshtë pasqyrojnë migrations dhe kodin real pas Sprintit
-6 dhe përfundimit UX të paneleve qytetar/zyrtar. Skedarët e vjetër PNG/Draw.io
+7, duke përfshirë panelet qytetar/zyrtar/admin. Skedarët e vjetër PNG/Draw.io
 në këtë dosje ruhen si drafte historike të
 paketës fillestare; ata nuk përdoren si burim i së vërtetës kur devijojnë nga
 ky dokument.
@@ -50,9 +50,9 @@ flowchart LR
   admin --> export
 ```
 
-`comment`, `officialOverview`, `verify`, `assign` dhe `workflow` janë
-implementuar. `manage`, `analytics` dhe `export` realizohen në Sprintet 7–8;
-`publicReport` i plotë mbetet pjesë e Sprintit 8.
+`comment`, `officialOverview`, `verify`, `assign`, `workflow`, `manage`,
+monitorimi i SLA/auditit dhe `export` janë implementuar. Statistikat publike,
+heatmap dhe `publicReport` i plotë mbeten pjesë e Sprintit 8.
 
 ## State diagram i raportit
 
@@ -90,6 +90,7 @@ erDiagram
   REPORTS ||--o{ REPORT_COMMENTS : "ka komente"
   REPORTS ||--o{ REPORT_ATTACHMENTS : "ka prova"
   REPORTS ||--o{ NOTIFICATIONS : "gjeneron"
+  AUTH_USERS ||--o{ AUDIT_LOGS : "vepron"
 
   AUTH_USERS {
     uuid id PK
@@ -159,6 +160,15 @@ erDiagram
     text type
     timestamptz read_at
   }
+  AUDIT_LOGS {
+    uuid id PK
+    uuid actor_id FK
+    text action
+    text entity_type
+    uuid entity_id
+    jsonb details
+    timestamptz created_at
+  }
 ```
 
 `audit_logs` është tabelë append-only me `actor_id`, `action`, `entity_type`,
@@ -189,6 +199,32 @@ flowchart TB
 
 Nuk ekziston backend i veçantë Express/NestJS në implementimin aktual.
 Autorizimi për të dhënat mbetet në PostgreSQL RLS dhe Storage policies.
+
+## Sequence diagram — administrimi dhe eksporti
+
+```mermaid
+sequenceDiagram
+  actor Admin as Administratori
+  participant Next as Next.js /admin
+  participant Auth as Supabase Auth
+  participant DB as PostgreSQL/RLS/Triggers
+
+  Admin->>Next: Hap panelin ose dërgon ndryshim
+  Next->>Auth: getUser()
+  Auth-->>Next: user i verifikuar
+  Next->>DB: Lexon rolin autoritativ nga profiles
+  DB-->>Next: admin
+  Next->>DB: UPDATE profil/departament/kategori
+  DB->>DB: RLS + kufijtë e integritetit
+  DB->>DB: INSERT audit_logs me actor_id
+  DB-->>Next: Ndryshimi u ruajt
+  opt Eksport CSV/JSON
+    Next->>DB: SELECT fusha operative me filtra
+    Next->>DB: record_admin_export(format, filters, row_count)
+    DB->>DB: Verifikon admin dhe shkruan audit log
+    Next-->>Admin: Skedar pa identitet/lokacion privat
+  end
+```
 
 ## Sequence diagram — krijimi i raportit
 

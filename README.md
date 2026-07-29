@@ -6,7 +6,7 @@ Titulli i punimit: **Zhvillimi i një platforme për raportimin, ndjekjen dhe zg
 
 ## Gjendja aktuale
 
-Sprintet 1–6 janë të implementuara në nivel aplikacioni dhe databaze:
+Sprintet 1–7 janë të implementuara në nivel aplikacioni dhe databaze:
 
 - arkitekturë, standarde të kodit dhe design system responsive;
 - Supabase me PostgreSQL/PostGIS, migrations, RLS, private Storage dhe views publike të sanitizuara;
@@ -23,6 +23,9 @@ Sprintet 1–6 janë të implementuara në nivel aplikacioni dhe databaze:
   njoftime dhe rihapje e kontrolluar nga qytetari;
 - panel zyrtar responsive me ngarkesën operative, radhën e vëmendjes,
   caktimet personale, afatet fillestare dhe njoftimet e palexuara;
+- panel administrativ responsive me menaxhim rolesh/departamentesh, kategori
+  dhe SLA, monitorim të vonesave, audit log vetëm për lexim dhe eksporte
+  CSV/JSON pa të dhëna personale;
 - dataset dhe seed databaze të sinkronizuar me 120 raporte sintetike, prej të
   cilave 104 publike me lokacion server-side të përgjithësuar;
 - Next.js 16.2.11, React 19, Turbopack default, TypeScript strict dhe ESLint flat config;
@@ -117,6 +120,7 @@ Lexo [udhëzuesin e Supabase](docs/supabase-setup.md) dhe [checklistën e autent
 - [Konfigurimi i autentikimit](docs/auth-setup.md)
 - [Baza e sigurisë](docs/security-baseline.md)
 - [Verifikimi i Sprintit 6](docs/sprint-6-verification.md)
+- [Verifikimi i Sprintit 7](docs/sprint-7-verification.md)
 - [Diagramet autoritative](diagrams/README.md)
 - [Roadmap](docs/roadmap.md)
 

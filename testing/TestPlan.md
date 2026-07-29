@@ -50,24 +50,33 @@ Ky plan testimi përshkruan qasjen për të vlerësuar funksionalitetin dhe sigu
 
 ## Mjedisi dhe Mjetet e Testimit
 - **Dataset**: `dataset/synthetic_dataset.json` me 120 raporte deterministike.
-- **Mjetet e planifikuara**: Playwright/Vitest për testet e automatizuara, Supabase SQL Editor për RLS dhe testime manuale vizuale. Nuk deklarojmë asnjë test si të kaluar para ekzekutimit të tij.
+- **Mjetet**: Vitest për funksionet e pastra, pgTAP në Supabase lokal/GitHub
+  Actions për databazën, smoke scripts për dev/staging dhe testim manual
+  vizual. Playwright mbetet për paketën end-to-end të Sprintit 9. Nuk
+  deklarojmë asnjë test si të kaluar para ekzekutimit të tij.
 
-## Automatizimi aktual në Sprintin 6
+## Automatizimi aktual pas Sprintit 7
 
-- `npm test` ekzekuton 56 teste Vitest për password/redirect/RBAC, skadimin
+- `npm test` ekzekuton 66 teste Vitest për password/redirect/RBAC, skadimin
   absolut të session-it, përmbledhjet e paneleve, validimin e
   raportit, workflow-n, normalizimin e view-t publik dhe heqjen fail-closed të
-  EXIF/GPS.
+  EXIF/GPS, si dhe validimin e administrimit, klasifikimin e SLA-së dhe
+  eksportin privacy-safe.
 - `npm run check:dataset` kontrollon që JSON-i me 120 raporte dhe SQL seed-i të
   jenë gjeneruar nga i njëjti burim.
-- `supabase/tests/database/pre_sprint6_hardening.test.sql` mbulon
+- `supabase/tests/database/pre_sprint6_hardening.test.sql` është regression
+  suite e sigurisë së databazës dhe mbulon
   përgjithësimin e lokacionit, privilegjet e RPC-së, komentet immutable,
   admin policy, RBAC, 120 raportet dhe rate limit-in me 21 assertions.
   Ekzekutohet me
   `npx supabase test db` pasi Supabase lokal/Docker të jetë aktiv.
 - `supabase/tests/database/sprint6_workflow.test.sql` shton 18 assertions për
   privilegjet, state machine-in, historinë, komentet interne, njoftimet dhe
-  rihapjen. GitHub Actions i ekzekuton të dyja suit-at në Supabase të izoluar.
+  rihapjen.
+- `supabase/tests/database/sprint7_admin_governance.test.sql` shton 22
+  assertions për privilegjet e eksportit, audit trigger-at, mbrojtjen e
+  administratorit/departamenteve, RLS-në dhe eventet e eksportit. GitHub
+  Actions i ekzekuton të tri suit-at në Supabase të izoluar.
 - `npm run verify:remote -- --allow-dev` verifikon krijimin e raportit qytetar,
   kufijtë e RPC-së, ndalimin e update-it direkt dhe upload/download-in privat
   e immutable të një prove sintetike në projektin e hostuar.

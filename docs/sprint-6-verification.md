@@ -38,19 +38,19 @@ në GitHub Actions.
 
 - `supabase/tests/database/pre_sprint6_hardening.test.sql` — 21 assertions;
 - `supabase/tests/database/sprint6_workflow.test.sql` — 18 assertions;
-- GitHub Actions nis një Supabase të izoluar me Docker dhe ekzekuton
-  `npx supabase test db`;
+- GitHub Actions nisi një Supabase të izoluar me Docker dhe ekzekutoi
+  `npx supabase test db`; run-i `30468252040` kaloi 39/39 assertions;
 - `npm run verify:sprint6 -- --allow-dev` kontrollon projektin e hostuar `dev`
   me llogari vetëm sintetike — passed më 2026-07-29;
 - `npx supabase db lint --linked --schema public --level warning
   --fail-on error` — passed pa gabime në skemën e aplikacionit më 2026-07-29;
-- `npx supabase test db --linked` nuk i ekzekutoi assertions sepse CLI kërkoi
-  Docker edhe për runner-in linked; prandaj 39 assertions mbeten për t'u
-  ekzekutuar nga job-i `database` në GitHub Actions.
+- `npx supabase test db --linked` nuk përdoret si provë sepse CLI kërkon
+  Docker edhe për runner-in linked; job-i `database` në GitHub Actions është
+  prova autoritative dhe kaloi.
 
-## Gate para Sprintit 7
+## Gate para Sprintit 7 — kaluar më 2026-07-29
 
-Sprinti 7 nuk fillon pa:
+Para fillimit të Sprintit 7 u verifikuan:
 
 1. migration history lokale/remote të sinkronizuar;
 2. pgTAP 39/39 assertions të kaluara;
@@ -59,3 +59,6 @@ Sprinti 7 nuk fillon pa:
 5. route smoke për `/citizen`, listën/detajin qytetar, official, admin dhe
    përdorues pa session;
 6. dokumentim dhe diagram state/sequence të sinkronizuar me implementimin.
+
+Shënimet e veçuara të completion pass-it për panelet qytetar/zyrtar u
+konsoliduan këtu; dokumentet e dyfishta u hoqën gjatë pastrimit të Sprintit 7.

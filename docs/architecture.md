@@ -21,8 +21,9 @@ Next.js 16 (Vercel planifikohet në Sprintin 10)
 
 - `app/(marketing)` — faqja publike dhe chrome publik.
 - `app/(auth)` — Login, Register, reset password dhe PKCE callback; nuk trashëgon navbar/footer publik.
-- `app/(workspace)` — route-t e mbrojtura për panelet qytetar/zyrtar,
-  raportimet qytetare, llogarinë, inbox-in/detajin zyrtar dhe njoftimet.
+- `app/(workspace)` — route-t e mbrojtura për panelet qytetar/zyrtar/admin,
+  raportimet qytetare, llogarinë, inbox-in/detajin zyrtar, njoftimet dhe
+  administrimin e roleve, strukturës, SLA-së, auditimit dhe eksporteve.
 - `components/` — UI e ripërdorshme, harta Leaflet dhe format; pa SQL ose privilegje databaze.
 - `lib/auth` — validimi i fjalëkalimit, mesazhet e kontrolluara dhe redirect-et e sigurta.
 - `lib/supabase` — klientë browser/server të tipizuar nga
@@ -33,19 +34,25 @@ Next.js 16 (Vercel planifikohet në Sprintin 10)
 - `lib/workflow` — state machine dhe validimi i inputeve të Sprintit 6.
   Përmbledhja dhe renditja e radhës operative të panelit zyrtar janë funksione
   të pastra të testueshme dhe nuk anashkalojnë RLS-në.
+- `lib/admin` — validimi i konfigurimit, klasifikimi i SLA-së, serializimi
+  privacy-safe i eksporteve dhe kontrolli server-side i rolit administrativ.
 - `supabase/migrations` — burimi i vetëm autoritativ për skemën, RLS dhe Storage.
 
 ## Kufijtë e sigurisë
 
 - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` lejohet në browser; RLS është mbrojtja reale.
-- Asnjë secret key nuk përdoret në Sprintin 3.
+- Asnjë secret/service-role key nuk përdoret; edhe administrimi përdor
+  session-in e administratorit, RLS dhe trigger-at e databazës.
 - Roli ruhet te `profiles`, jo te user metadata e kontrollueshme nga klienti.
 - Views publike nxjerrin vetëm të dhëna të sanitizuara të raporteve të
   publikuara; koordinata publike llogaritet nga trigger-i, jo nga browser-i.
-- `proxy.ts` prek vetëm route-t e mbrojtura dhe zbaton matricën e roleve nga
-  `profiles`; faqet publike dhe format e autentikimit nuk bëjnë thirrje të
-  panevojshme te Auth në çdo ngarkim.
-- Kontrolli server-side me `auth.getUser()` mbetet i detyrueshëm edhe kur Proxy ka bërë redirect.
+- `proxy.ts` prek vetëm route-t e mbrojtura, verifikon JWT-në me
+  `auth.getClaims()` dhe ngarkon kontekstin autoritativ të session-it, profilit
+  dhe njoftimeve me një RPC të vetëm. Header-at e brendshëm pastrohen dhe
+  rishkruhen nga Proxy para se të lexohen nga Server Components.
+- `current_request_context()` lidhet me `auth.sessions.session_id`, prandaj
+  session-et e revokuara dështojnë në mënyrë të mbyllur. Faqet e mbrojtura
+  ripërdorin këtë kontekst pa përsëritur kontrollet Auth/profil/njoftime.
 - Headers bazë të sigurisë vendosen për çdo përgjigje; HSTS shtohet vetëm në production HTTPS.
 
 ## Vendime të qëllimshme

@@ -1,4 +1,4 @@
-# Baza e sigurisë — Sprint 3
+# Baza aktuale e sigurisë
 
 ## E implementuar në kod
 
@@ -9,6 +9,10 @@
 - Session-et e workspace-it skadojnë absolutisht një orë pas hyrjes;
   kontrolli server-side fail-closed plotësohet nga timer-i në browser dhe
   dalja prek vetëm session-in aktual.
+- JWT-ja verifikohet server-side me `auth.getClaims()`; RPC-ja
+  `current_request_context()` kontrollon session-in e nënshkruar te
+  `auth.sessions`, rolin autoritativ te `profiles` dhe numrin e njoftimeve në
+  një round trip. Header-at e kontekstit nga klienti hiqen para përdorimit.
 - Redirect-e vetëm drejt path-eve të brendshme të validuara.
 - Fjalëkalim minimal 10 karaktere me shkronja të mëdha/vogla dhe numër.
 - Security headers: `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, `Cross-Origin-Opener-Policy` dhe HSTS në production.
@@ -36,6 +40,12 @@
   është immutable, përveç ndërhyrjes administrative.
 - SECURITY DEFINER functions përdorin `search_path` bosh dhe rolet e Data API
   nuk kanë privilegj `CREATE` në schema `public`.
+- Route-t `/admin/*` kërkojnë rolin autoritativ `admin`; ndryshimet e
+  roleve/departamenteve/kategorive auditohen nga trigger-at e databazës.
+- Administratori nuk mund ta ulë vetë rolin, një zyrtar kërkon departament
+  aktiv dhe departamenti me zyrtarë nuk mund të çaktivizohet para ricaktimit.
+- Eksportet administrative përdorin allowlist fushash operative, përjashtojnë
+  të dhënat personale/private dhe regjistrohen para shkarkimit.
 
 ## Konfigurime manuale para deploy-it
 
@@ -48,6 +58,7 @@
 
 ## Nuk bëjmë ende
 
-- Nuk shtojmë `service_role`/secret key, sepse nuk ka operacion administrativ server-side që e kërkon.
+- Nuk shtojmë `service_role`/secret key; operacionet administrative përdorin
+  session-in e adminit, RLS dhe RPC/trigger-a të guard-uar.
 - Nuk vendosim Content Security Policy me `unsafe-inline`; CSP me nonce do të shtohet në Sprintin 10 pasi të përfshihen harta dhe provider-at e jashtëm.
 - Nuk bëjmë ndryshime direkte në Supabase Cloud pa migration të commit-uar.

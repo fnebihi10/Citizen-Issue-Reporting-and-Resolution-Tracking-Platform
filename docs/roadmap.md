@@ -26,9 +26,12 @@ Krijimi i raportit, kategoritë, validimi, fotografia, lokacioni, raportimet e m
 
 Inbox-i i zyrtarit, verifikimi, caktimi i departamentit, tranzicionet e statusit, komentet, historia dhe rihapja.
 
-## Sprint 7 — Administration & SLA
+## Sprint 7 — Administration & SLA (implementuar)
 
-Përdoruesit, departamentet, kategoritë, SLA, vonesat, audit log dhe eksportet CSV/JSON.
+Paneli administrativ, përdoruesit/rolet, departamentet, kategoritë, SLA,
+vonesat, audit log dhe eksportet CSV/JSON privacy-safe. Çdo ndryshim i
+ndjeshëm auditohet nga databaza dhe route-t `/admin/*` kërkojnë rolin
+autoritativ `admin`.
 
 ## Sprint 8 — Public transparency & analytics
 

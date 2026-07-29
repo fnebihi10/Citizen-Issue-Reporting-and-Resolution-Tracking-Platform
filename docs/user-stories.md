@@ -58,7 +58,7 @@ Kriteret e pranimit:
 - nuk ekspozon lokacionin e saktë në markup;
 - gjendjet empty/error/loading janë të qarta.
 
-Përfundimi UX para Sprintit 7:
+Përfundimi UX i Sprintit 6:
 
 - `/citizen` është faqja hyrëse e hapësirës qytetare;
 - paneli shfaq totalin, raportet aktive/të zgjidhura, njoftimet e palexuara,
@@ -96,7 +96,8 @@ Kriteret e pranimit:
 
 Përfundimi UX para Sprintit 7:
 
-- `/official` është faqja hyrëse për zyrtarin dhe administratorin;
+- `/official` është faqja hyrëse për zyrtarin; administratori hyn te
+  `/admin`, por ruan qasje të autorizuar te detaji zyrtar i raportit;
 - paneli përmbledh raportet për verifikim, caktimet e zyrtarit, rastet në
   proces dhe prioritetet `high`/`urgent`;
 - radha e vëmendjes renditet në mënyrë deterministike sipas prioritetit,
@@ -110,13 +111,17 @@ Përfundimi UX para Sprintit 7:
 Si administrator dua të menaxhoj role, departamente, kategori dhe SLA, që
 platforma të funksionojë me përgjegjësi të qarta.
 
-Kriteret e pranimit të planifikuara:
+Kriteret e pranimit të implementuara:
 
 - vetëm admini ndryshon role/departamente;
 - një zyrtar ka detyrimisht departament;
-- ndryshimet e ndjeshme auditohen;
-- raportet e vonuara identifikohen;
-- eksportet CSV/JSON respektojnë privatësinë.
+- administratori nuk mund ta ulë vetë rolin dhe departamenti me zyrtarë nuk
+  çaktivizohet pa ricaktim;
+- ndryshimet e ndjeshme auditohen nga trigger-at e databazës;
+- `/admin/sla` identifikon raportet e vonuara, afër skadimit dhe në afat;
+- eksportet CSV/JSON respektojnë privatësinë dhe vetë eksporti auditohet;
+- paneli, formularët dhe listat janë responsive dhe kanë loading/error/empty
+  states.
 
 ## US-08 — Publiku analizon rezultatet (Sprint 8)
 
