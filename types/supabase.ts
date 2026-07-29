@@ -525,6 +525,17 @@ export type Database = {
         Args: never
         Returns: Database["public"]["Enums"]["user_role"]
       }
+      current_request_context: {
+        Args: never
+        Returns: {
+          department_id: string | null
+          full_name: string
+          role: Database["public"]["Enums"]["user_role"]
+          session_started_at: string
+          unread_count: number
+          user_id: string
+        }[]
+      }
       generalize_location: {
         Args: { exact: unknown; precision_m?: number }
         Returns: unknown
@@ -534,6 +545,14 @@ export type Database = {
       reopen_resolved_report: {
         Args: { p_reason: string; p_report_id: string }
         Returns: Database["public"]["Enums"]["report_status"]
+      }
+      record_admin_export: {
+        Args: {
+          p_filters?: Json
+          p_format: string
+          p_row_count?: number
+        }
+        Returns: string
       }
       report_id_from_storage_path: {
         Args: { object_name: string }
