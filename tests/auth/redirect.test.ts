@@ -32,7 +32,7 @@ describe('getSafeInternalPath', () => {
   it('maps authenticated roles to their workspace home', () => {
     expect(getRoleHomePath('citizen')).toBe('/citizen');
     expect(getRoleHomePath('official')).toBe('/official');
-    expect(getRoleHomePath('admin')).toBe('/official');
+    expect(getRoleHomePath('admin')).toBe('/admin');
     expect(getRoleHomePath(undefined)).toBe(defaultAuthenticatedPath);
   });
 });

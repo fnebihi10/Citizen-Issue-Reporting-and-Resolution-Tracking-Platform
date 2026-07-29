@@ -23,6 +23,7 @@ export function getSafeInternalPath(value: string | null, fallback = defaultAuth
 
 export function getRoleHomePath(role: UserRole | null | undefined) {
   if (role === 'citizen') return '/citizen';
-  if (role === 'official' || role === 'admin') return '/official';
+  if (role === 'official') return '/official';
+  if (role === 'admin') return '/admin';
   return defaultAuthenticatedPath;
 }
