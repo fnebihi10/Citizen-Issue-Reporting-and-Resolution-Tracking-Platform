@@ -40,6 +40,10 @@ const nextConfig = {
         headers: privateNoStoreHeaders,
       },
       {
+        source: '/notifications/:path*',
+        headers: privateNoStoreHeaders,
+      },
+      {
         source: '/official/:path*',
         headers: privateNoStoreHeaders,
       },

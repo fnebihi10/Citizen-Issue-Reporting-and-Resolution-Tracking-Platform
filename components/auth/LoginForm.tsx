@@ -7,17 +7,19 @@ import { useRouter } from 'next/navigation';
 import { PasswordInput } from '@/components/auth/PasswordInput';
 import { Button } from '@/components/ui/button';
 import { translateSignInError } from '@/lib/auth/messages';
+import { getRoleHomePath } from '@/lib/auth/redirect';
 import { createClient } from '@/lib/supabase/client';
 
 type LoginFormProps = {
   nextPath: string;
+  useRoleHome: boolean;
   callbackFailed: boolean;
 };
 
 const authInputClassName =
   'field-input rounded-[14px] border-slate-200 bg-white/75 pl-11 text-[15px] shadow-[0_1px_2px_rgba(15,23,42,0.03)] hover:border-slate-300 focus:border-blue-600 focus:bg-white focus:ring-blue-100';
 
-export function LoginForm({ nextPath, callbackFailed }: LoginFormProps) {
+export function LoginForm({ nextPath, useRoleHome, callbackFailed }: LoginFormProps) {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -34,7 +36,7 @@ export function LoginForm({ nextPath, callbackFailed }: LoginFormProps) {
     setError('');
 
     const supabase = createClient();
-    const { error: signInError } = await supabase.auth.signInWithPassword({
+    const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
       email: email.trim().toLowerCase(),
       password,
     });
@@ -45,7 +47,17 @@ export function LoginForm({ nextPath, callbackFailed }: LoginFormProps) {
       return;
     }
 
-    router.replace(nextPath);
+    let destination = nextPath;
+    if (useRoleHome && signInData.user) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', signInData.user.id)
+        .maybeSingle();
+      destination = getRoleHomePath(profile?.role);
+    }
+
+    router.replace(destination);
     router.refresh();
   }
 

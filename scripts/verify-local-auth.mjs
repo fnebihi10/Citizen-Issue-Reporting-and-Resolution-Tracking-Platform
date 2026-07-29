@@ -22,6 +22,10 @@ const auditEmail =
   process.env.REMOTE_AUDIT_EMAIL ?? 'synthetic.citizen@example.test';
 const auditPassword =
   process.env.REMOTE_AUDIT_PASSWORD ?? 'SyntheticDemoOnly!2026';
+const officialEmail =
+  process.env.REMOTE_OFFICIAL_EMAIL ?? 'synthetic.official@example.test';
+const officialPassword =
+  process.env.REMOTE_OFFICIAL_PASSWORD ?? 'SyntheticDemoOnly!2026';
 
 if (!supabaseUrl || !publishableKey) {
   throw new Error('Missing public Supabase configuration in .env.local.');
@@ -168,9 +172,18 @@ try {
   cookieJar.clear();
   originalCookies.forEach((cookie, name) => cookieJar.set(name, cookie));
 
-  const citizenResponse = await request('/citizen/report');
-  if (citizenResponse.status !== 200) {
-    throw new Error(`/citizen/report returned ${citizenResponse.status}.`);
+  for (const pathname of [
+    '/citizen',
+    '/citizen/report',
+    '/citizen/reports',
+    '/notifications',
+  ]) {
+    const response = await request(pathname);
+    if (response.status !== 200) {
+      throw new Error(
+        `${pathname} returned ${response.status} for the synthetic citizen.`,
+      );
+    }
   }
 
   for (const pathname of ['/official', '/admin']) {
@@ -187,10 +200,80 @@ try {
       );
     }
   }
+
+  await supabase.auth.signOut();
+
+  for (const pathname of [
+    '/account',
+    '/citizen',
+    '/citizen/report',
+    '/citizen/reports',
+    '/official',
+    '/official/reports',
+    '/notifications',
+  ]) {
+    const response = await request(pathname);
+    const location = response.headers.get('location');
+    if (
+      ![307, 308].includes(response.status)
+      || !location
+      || new URL(location, localUrl).pathname !== '/login'
+    ) {
+      throw new Error(
+        `${pathname} did not redirect a signed-out visitor to /login.`,
+      );
+    }
+  }
+
+  const { error: officialSignInError } = await supabase.auth.signInWithPassword({
+    email: officialEmail,
+    password: officialPassword,
+  });
+  if (officialSignInError) throw officialSignInError;
+
+  for (const pathname of [
+    '/account',
+    '/official',
+    '/official/reports',
+    '/notifications',
+  ]) {
+    const response = await request(pathname);
+    if (response.status !== 200) {
+      throw new Error(
+        `${pathname} returned ${response.status} for the synthetic official.`,
+      );
+    }
+  }
+
+  const officialDashboardResponse = await request('/official');
+  const officialDashboardHtml = await officialDashboardResponse.text();
+  if (
+    !officialDashboardHtml.includes('Paneli zyrtar')
+    || !officialDashboardHtml.includes('Kërkojnë vëmendje')
+    || !officialDashboardHtml.includes('Inbox-i i plotë')
+  ) {
+    throw new Error(
+      '/official did not render the expected operational dashboard.',
+    );
+  }
+
+  const officialCitizenRoute = await request('/citizen/report');
+  const officialCitizenLocation = officialCitizenRoute.headers.get('location');
+  if (
+    ![307, 308].includes(officialCitizenRoute.status)
+    || !officialCitizenLocation
+    || new URL(officialCitizenLocation, localUrl).pathname !== '/account'
+    || new URL(officialCitizenLocation, localUrl).searchParams.get('error')
+      !== 'forbidden'
+  ) {
+    throw new Error(
+      '/citizen/report did not enforce the official role boundary.',
+    );
+  }
 } finally {
   await supabase.auth.signOut();
 }
 
 console.log(
-  'Local authenticated verification passed: SSR session refresh, account/citizen access, and official/admin role denials.',
+  'Local route verification passed: SSR refresh, signed-out redirects, citizen/official access, and cross-role denials.',
 );

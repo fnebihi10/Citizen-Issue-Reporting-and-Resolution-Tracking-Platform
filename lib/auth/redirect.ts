@@ -1,3 +1,5 @@
+import type { UserRole } from '@/types/database';
+
 export const defaultAuthenticatedPath = '/account';
 
 export function getSafeInternalPath(value: string | null, fallback = defaultAuthenticatedPath) {
@@ -17,4 +19,10 @@ export function getSafeInternalPath(value: string | null, fallback = defaultAuth
   } catch {
     return fallback;
   }
+}
+
+export function getRoleHomePath(role: UserRole | null | undefined) {
+  if (role === 'citizen') return '/citizen';
+  if (role === 'official' || role === 'admin') return '/official';
+  return defaultAuthenticatedPath;
 }

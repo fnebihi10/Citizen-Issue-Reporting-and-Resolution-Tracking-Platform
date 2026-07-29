@@ -48,7 +48,7 @@ export default function RegisterPage() {
 
     setLoading(true);
     const callbackUrl = new URL('/auth/callback', window.location.origin);
-    callbackUrl.searchParams.set('next', '/account');
+    callbackUrl.searchParams.set('next', '/citizen');
 
     const supabase = createClient();
     const { data, error: signUpError } = await supabase.auth.signUp({
@@ -67,7 +67,7 @@ export default function RegisterPage() {
     }
 
     if (data.session) {
-      router.replace('/account');
+      router.replace('/citizen');
       router.refresh();
       return;
     }

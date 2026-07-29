@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   defaultAuthenticatedPath,
+  getRoleHomePath,
   getSafeInternalPath,
 } from '@/lib/auth/redirect';
 
@@ -26,5 +27,12 @@ describe('getSafeInternalPath', () => {
 
   it('supports an explicit safe fallback', () => {
     expect(getSafeInternalPath('invalid', '/login')).toBe('/login');
+  });
+
+  it('maps authenticated roles to their workspace home', () => {
+    expect(getRoleHomePath('citizen')).toBe('/citizen');
+    expect(getRoleHomePath('official')).toBe('/official');
+    expect(getRoleHomePath('admin')).toBe('/official');
+    expect(getRoleHomePath(undefined)).toBe(defaultAuthenticatedPath);
   });
 });

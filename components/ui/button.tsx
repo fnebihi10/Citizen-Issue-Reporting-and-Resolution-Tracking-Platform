@@ -7,6 +7,7 @@ const buttonVariants = {
   dark: 'bg-slate-950 text-white shadow-sm hover:bg-slate-800',
   ghost: 'text-slate-600 hover:bg-slate-100 hover:text-slate-950',
   success: 'bg-emerald-600 text-white shadow-sm hover:bg-emerald-700',
+  destructive: 'bg-rose-600 text-white shadow-sm hover:bg-rose-700',
 } as const;
 
 const buttonSizes = {

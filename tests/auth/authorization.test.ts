@@ -15,6 +15,9 @@ describe('role route authorization', () => {
     ['/admin/users', 'admin', true],
     ['/admin/users', 'official', false],
     ['/account', 'citizen', true],
+    ['/notifications', 'citizen', true],
+    ['/notifications', 'official', true],
+    ['/notifications', 'admin', true],
   ] as const)('%s with %s is %s', (pathname, role, expected) => {
     expect(canRoleAccessPath(pathname, role)).toBe(expected);
   });

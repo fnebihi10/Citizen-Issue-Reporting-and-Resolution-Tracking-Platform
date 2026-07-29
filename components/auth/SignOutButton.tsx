@@ -15,7 +15,7 @@ export function SignOutButton() {
     setLoading(true);
     setError('');
     const supabase = createClient();
-    const { error: signOutError } = await supabase.auth.signOut();
+    const { error: signOutError } = await supabase.auth.signOut({ scope: 'local' });
 
     if (signOutError) {
       setError('Dalja nga llogaria nuk mundi të përfundojë. Provo përsëri.');

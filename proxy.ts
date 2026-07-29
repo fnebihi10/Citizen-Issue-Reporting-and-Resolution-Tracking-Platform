@@ -8,6 +8,7 @@ export async function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     '/account/:path*',
+    '/notifications/:path*',
     '/citizen/:path*',
     '/official/:path*',
     '/admin/:path*',

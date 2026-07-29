@@ -1,10 +1,17 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 import { getAllowedRolesForPath } from '@/lib/auth/authorization';
+import { isSessionExpired } from '@/lib/auth/sessionExpiry';
 import { getPublicSupabaseConfig } from '@/lib/env';
 import type { Database } from '@/types/supabase';
 
-const protectedPrefixes = ['/account', '/citizen', '/official', '/admin'];
+const protectedPrefixes = [
+  '/account',
+  '/notifications',
+  '/citizen',
+  '/official',
+  '/admin',
+];
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
@@ -54,6 +61,20 @@ export async function updateSession(request: NextRequest) {
       if (value) redirectResponse.headers.set(headerName, value);
     });
     return redirectResponse;
+  }
+
+  if (
+    user
+    && isProtectedRoute
+    && isSessionExpired(user.last_sign_in_at ?? user.created_at)
+  ) {
+    await supabase.auth.signOut({ scope: 'local' });
+    const loginUrl = request.nextUrl.clone();
+    loginUrl.pathname = '/login';
+    loginUrl.search = '';
+    loginUrl.searchParams.set('expired', '1');
+    loginUrl.searchParams.set('next', `${pathname}${request.nextUrl.search}`);
+    return redirectWithSession(loginUrl);
   }
 
   if (!user && isProtectedRoute) {
