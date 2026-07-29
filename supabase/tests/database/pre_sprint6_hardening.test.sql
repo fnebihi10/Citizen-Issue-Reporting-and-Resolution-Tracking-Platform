@@ -154,11 +154,11 @@ select ok(
 select ok(
   exists (
     select 1
-    from pg_catalog.pg_policies
-    where schemaname = 'public'
-      and tablename = 'reports'
-      and policyname = 'reports_citizen_insert'
-      and pg_catalog.position('current_user_role' in with_check) > 0
+    from pg_catalog.pg_policies p
+    where p.schemaname = 'public'
+      and p.tablename = 'reports'
+      and p.policyname = 'reports_citizen_insert'
+      and pg_catalog.strpos(p.with_check, 'current_user_role') > 0
   ),
   'citizen report inserts require the authoritative citizen profile role'
 );
@@ -166,11 +166,11 @@ select ok(
 select ok(
   exists (
     select 1
-    from pg_catalog.pg_policies
-    where schemaname = 'public'
-      and tablename = 'report_attachments'
-      and policyname = 'attachments_participant_or_authorized_staff_insert'
-      and pg_catalog.position('kind' in with_check) > 0
+    from pg_catalog.pg_policies p
+    where p.schemaname = 'public'
+      and p.tablename = 'report_attachments'
+      and p.policyname = 'attachments_participant_or_authorized_staff_insert'
+      and pg_catalog.strpos(p.with_check, 'kind') > 0
   ),
   'attachment insert policy constrains the citizen attachment kind'
 );
@@ -208,11 +208,11 @@ select ok(
 );
 
 select ok(
-  pg_catalog.position(
-    'pg_catalog.coalesce'
-    in pg_catalog.pg_get_functiondef(
+  pg_catalog.strpos(
+    pg_catalog.pg_get_functiondef(
       'public.suggest_similar_reports(uuid,double precision,double precision,integer)'::regprocedure
-    )
+    ),
+    'pg_catalog.coalesce'
   ) = 0,
   'similar-report RPC does not schema-qualify the COALESCE SQL expression'
 );
