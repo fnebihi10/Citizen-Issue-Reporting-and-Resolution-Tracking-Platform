@@ -171,8 +171,13 @@ try {
     .eq('id', ownReport.id)
     .select('id');
 
-  if (tamperError) throw tamperError;
-  if ((tamperedRows ?? []).length > 0) {
+  const updateWasDenied =
+    tamperError
+    && /permission denied|not allowed|42501/i.test(
+      `${tamperError.code ?? ''} ${tamperError.message ?? ''}`,
+    );
+  if (tamperError && !updateWasDenied) throw tamperError;
+  if (!tamperError && (tamperedRows ?? []).length > 0) {
     await authenticatedClient
       .from('reports')
       .update({ priority: ownReport.priority })

@@ -71,6 +71,7 @@ enabled = true
 sql_paths = [
   "./seed.sql",
   "./seeds/00_synthetic_users.sql",
+  "./seeds/01_sprint6_staff.sql",
   "./seeds/synthetic_reports.sql"
 ]
 

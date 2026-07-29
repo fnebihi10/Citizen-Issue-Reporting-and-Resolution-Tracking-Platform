@@ -19,6 +19,7 @@
     "generate:dataset": "node generate_dataset.js",
     "check:dataset": "node generate_dataset.js --check",
     "verify:remote": "node scripts/verify-remote.mjs",
+    "verify:sprint6": "node scripts/verify-sprint6-remote.mjs",
     "verify:local-auth": "node scripts/verify-local-auth.mjs",
     "generate:types": "supabase gen types typescript --linked --schema public > types/supabase.ts"
   },

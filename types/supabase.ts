@@ -510,6 +510,10 @@ export type Database = {
       }
     }
     Functions: {
+      add_report_comment: {
+        Args: { p_body: string; p_is_internal?: boolean; p_report_id: string }
+        Returns: string
+      }
       can_view_staff_report: {
         Args: {
           requested_department_id: string
@@ -527,6 +531,10 @@ export type Database = {
       }
       is_admin: { Args: never; Returns: boolean }
       is_official_or_admin: { Args: never; Returns: boolean }
+      reopen_resolved_report: {
+        Args: { p_reason: string; p_report_id: string }
+        Returns: Database["public"]["Enums"]["report_status"]
+      }
       report_id_from_storage_path: {
         Args: { object_name: string }
         Returns: string
@@ -545,6 +553,20 @@ export type Database = {
           status: Database["public"]["Enums"]["report_status"]
           title: string
         }[]
+      }
+      transition_report_workflow: {
+        Args: {
+          p_assigned_official_id?: string
+          p_department_id?: string
+          p_is_public?: boolean
+          p_note?: string
+          p_priority?: Database["public"]["Enums"]["report_priority"]
+          p_public_summary?: string
+          p_public_title?: string
+          p_report_id: string
+          p_target_status: Database["public"]["Enums"]["report_status"]
+        }
+        Returns: Database["public"]["Enums"]["report_status"]
       }
     }
     Enums: {
