@@ -43,7 +43,7 @@ select is(
   'location generalization is deterministic'
 );
 
-select col_not_exists(
+select hasnt_column(
   'public',
   'report_comments',
   'updated_at',

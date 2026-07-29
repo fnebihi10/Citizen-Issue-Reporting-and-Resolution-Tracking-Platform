@@ -139,6 +139,9 @@ select is(
   'every status transition is recorded immutably'
 );
 
+set local "request.jwt.claims" =
+  '{"sub":"00000000-0000-4000-8000-000000000001","role":"authenticated"}';
+
 select is(
   (
     select count(*)
@@ -150,6 +153,9 @@ select is(
   4::bigint,
   'the citizen receives a notification for every staff status change'
 );
+
+set local "request.jwt.claims" =
+  '{"sub":"00000000-0000-4000-8000-000000000010","role":"authenticated"}';
 
 select isnt(
   public.add_report_comment(
