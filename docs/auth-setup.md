@@ -32,7 +32,14 @@ Për testim lokal, këto vlera janë pasqyruar edhe te [`supabase/config.toml`](
 - `/forgot-password` — dërgon kërkesë për reset pa zbuluar nëse email-i ekziston.
 - `/update-password` — kërkon session të vlefshëm dhe vendos fjalëkalimin e ri.
 - `/account` — lexon profilin në server; route-i është i mbrojtur edhe me Proxy edhe me kontroll server-side.
-- `SignOutButton` — mbyll session-in dhe jep feedback në rast gabimi.
+- Hyrja pa një destinacion `next` e dërgon qytetarin te `/citizen` dhe stafin
+  te `/official`; një destinacion i brendshëm eksplicit ruhet.
+- Çdo session i workspace-it ka jetëgjatësi absolute një orë nga
+  `last_sign_in_at`. Proxy e zbaton para çdo route-i të mbrojtur, ndërsa
+  header-i mban timer-in aktiv edhe kur faqja mbetet e hapur.
+- Pas skadimit mbyllet vetëm session-i i browser-it aktual, ruhet destinacioni
+  i brendshëm dhe login-i shpjegon pse kërkohet hyrje e re.
+- `SignOutButton` — mbyll vetëm session-in lokal dhe jep feedback në rast gabimi.
 
 `@supabase/ssr` përdor PKCE dhe cookie-based sessions. Callback-i ruan përgjigjet e autentikimit me `Cache-Control: private, no-store`, për të shmangur cache të session cookie-ve.
 
@@ -45,6 +52,8 @@ Proxy kontrollon rolin nga `profiles`, jo nga metadata e klientit:
 
 Redirect-et e Proxy-t bartin edhe cookie-t/header-at e një session refresh-i, që
 kontrolli i rolit të mos ndërpresë rifreskimin e vlefshëm të sesionit.
+Rifreskimi automatik i JWT-së nuk e zgjat kufirin absolut njëorësh të
+aplikacionit.
 
 ## Rolet
 

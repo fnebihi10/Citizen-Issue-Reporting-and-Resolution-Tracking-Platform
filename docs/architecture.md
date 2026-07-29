@@ -21,13 +21,18 @@ Next.js 16 (Vercel planifikohet në Sprintin 10)
 
 - `app/(marketing)` — faqja publike dhe chrome publik.
 - `app/(auth)` — Login, Register, reset password dhe PKCE callback; nuk trashëgon navbar/footer publik.
-- `app/(workspace)` — route-t e mbrojtura `/account`, `/citizen/report` dhe `/citizen/reports`.
+- `app/(workspace)` — route-t e mbrojtura për panelet qytetar/zyrtar,
+  raportimet qytetare, llogarinë, inbox-in/detajin zyrtar dhe njoftimet.
 - `components/` — UI e ripërdorshme, harta Leaflet dhe format; pa SQL ose privilegje databaze.
 - `lib/auth` — validimi i fjalëkalimit, mesazhet e kontrolluara dhe redirect-et e sigurta.
 - `lib/supabase` — klientë browser/server të tipizuar nga
   `types/supabase.ts` dhe rifreskimi i session-it.
 - `lib/reports` — validimi, sanitizimi fail-closed i fotografive dhe
-  normalizimi i të dhënave publike.
+  normalizimi i të dhënave publike; përmbledhja dhe filtrimi i panelit qytetar
+  mbeten funksione të pastra të testueshme.
+- `lib/workflow` — state machine dhe validimi i inputeve të Sprintit 6.
+  Përmbledhja dhe renditja e radhës operative të panelit zyrtar janë funksione
+  të pastra të testueshme dhe nuk anashkalojnë RLS-në.
 - `supabase/migrations` — burimi i vetëm autoritativ për skemën, RLS dhe Storage.
 
 ## Kufijtë e sigurisë

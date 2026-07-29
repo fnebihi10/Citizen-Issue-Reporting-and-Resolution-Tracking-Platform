@@ -1,7 +1,8 @@
 # Diagramet autoritative
 
 Diagramet Mermaid më poshtë pasqyrojnë migrations dhe kodin real pas Sprintit
-5. Skedarët e vjetër PNG/Draw.io në këtë dosje ruhen si drafte historike të
+6 dhe përfundimit UX të paneleve qytetar/zyrtar. Skedarët e vjetër PNG/Draw.io
+në këtë dosje ruhen si drafte historike të
 paketës fillestare; ata nuk përdoren si burim i së vërtetës kur devijojnë nga
 ky dokument.
 
@@ -24,6 +25,7 @@ flowchart LR
     createReport([Krijo raport me lokacion dhe fotografi])
     trackOwn([Ndiq raportimet e mia])
     comment([Komento dhe merr njoftime])
+    officialOverview([Shiko panelin dhe radhën operative])
     verify([Verifiko raportin])
     assign([Cakto departamentin])
     workflow([Ndrysho statusin dhe dokumento zgjidhjen])
@@ -39,6 +41,7 @@ flowchart LR
   citizen --> trackOwn
   citizen --> comment
   official --> verify
+  official --> officialOverview
   official --> assign
   official --> workflow
   official --> comment
@@ -47,8 +50,9 @@ flowchart LR
   admin --> export
 ```
 
-`publicReport`, `comment`, `verify`, `assign`, `workflow`, `manage`,
-`analytics` dhe `export` realizohen në Sprintet 6–8 sipas roadmap-it.
+`comment`, `officialOverview`, `verify`, `assign` dhe `workflow` janë
+implementuar. `manage`, `analytics` dhe `export` realizohen në Sprintet 7–8;
+`publicReport` i plotë mbetet pjesë e Sprintit 8.
 
 ## State diagram i raportit
 
@@ -60,7 +64,7 @@ stateDiagram-v2
   UnderReview --> Rejected: refuzohet me arsye
   Assigned --> InProgress: fillon puna
   InProgress --> Resolved: zgjidhet me shënime
-  Resolved --> Reopened: qytetari/zyrtari e rihap
+  Resolved --> Reopened: qytetari e rihap me arsye
   Reopened --> UnderReview: riverifikim
   Rejected --> [*]
   Resolved --> [*]
@@ -218,4 +222,31 @@ sequenceDiagram
     DB-->>Browser: Prova u regjistrua
   end
   Browser-->>Citizen: Success ose paralajmërim i kontrolluar
+```
+
+## Sequence diagram — paneli dhe workflow zyrtar
+
+```mermaid
+sequenceDiagram
+  actor Official as Zyrtari
+  participant Next as Next.js workspace
+  participant Auth as Supabase Auth
+  participant DB as PostgreSQL/RLS/RPC
+  participant Citizen as Qytetari
+
+  Official->>Next: Hap /official
+  Next->>Auth: getUser()
+  Auth-->>Next: user i verifikuar
+  Next->>DB: Lexon profilin, raportet dhe njoftimet
+  DB->>DB: Zbaton scope-in RLS sipas rolit/departamentit
+  DB-->>Next: Ngarkesa, radha operative dhe caktimet
+  Next-->>Official: Paneli zyrtar
+  Official->>Next: Hap raportin dhe dërgon tranzicionin
+  Next->>Auth: Rikonfirmon user-in dhe rolin
+  Next->>DB: transition_report_workflow(...)
+  DB->>DB: Validon state machine, caktimin dhe shënimin
+  DB->>DB: Shkruan history, audit log dhe notification
+  DB-->>Next: Workflow i përditësuar
+  Next-->>Official: Statusi, historia dhe feedback-u
+  DB-->>Citizen: Njoftim për statusin/komentin publik
 ```

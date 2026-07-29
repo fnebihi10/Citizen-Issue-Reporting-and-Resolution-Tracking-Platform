@@ -1,4 +1,4 @@
-# Modeli i databazës — Sprintet 2–5
+# Modeli i databazës — Sprintet 2–6
 
 ## Entitetet
 
@@ -69,6 +69,20 @@ qytetarit aktual.
 ## SLA
 
 `categories.default_sla_hours` është burimi i SLA-së fillestare. Trigger-i vendos `reports.sla_due_at` gjatë insert-it; përdoruesi nuk mund ta zgjatë vetë afatin duke dërguar një vlerë tjetër.
+
+## Workflow i Sprintit 6
+
+- `transition_report_workflow` është e vetmja rrugë Data API për ndryshimet
+  operative të stafit; `authenticated` nuk ka privilegj direkt `UPDATE` mbi
+  `reports`.
+- RPC-ja kyç rreshtin, verifikon rolin/departamentin, caktimin e zyrtarit,
+  përmbajtjen e sanitizuar publike dhe state machine-in.
+- `add_report_comment` vendos autorin nga `auth.uid()` dhe bllokon shënimet
+  interne nga qytetari.
+- `reopen_resolved_report` lejon vetëm pronarin të kalojë `resolved -> reopened`
+  dhe ruan arsyen si histori dhe koment.
+- Trigger-at e njoftimeve krijojnë njoftime për ndryshimet e statusit dhe
+  komentet jo-interne. Klienti nuk mund të krijojë përmbajtje njoftimi.
 
 ER diagrami autoritativ dhe state machine-i i sinkronizuar me migrations janë
 te [`diagrams/README.md`](../diagrams/README.md).

@@ -4,6 +4,8 @@ Ky dokument përmbledh kërkesat zyrtare të mentorit për temën:
 **“Zhvillimi i një platforme për raportimin, ndjekjen dhe zgjidhjen e
 problemeve qytetare”**. Kërkesat këtu kanë përparësi ndaj preferencave të
 mëparshme të dizajnit; `docs/roadmap.md` përcakton rendin e implementimit.
+Përmbajtja u rikontrollua kundër email-it të plotë të mentorit, përfshirë
+funksionet, kufijtë, testimin, teknologjitë dhe dorëzimet e kërkuara.
 
 ## 1. Qëllimi dhe fusha
 
@@ -178,7 +180,7 @@ adresa, foto ose lokacione që identifikojnë persona realë.
 
 ## 6. Gjendja sipas roadmap-it
 
-| Fusha | Gjendja pas Sprintit 5 |
+| Fusha | Gjendja pas Sprintit 6 |
 |---|---|
 | Foundation, arkitekturë dhe design system | Implementuar |
 | PostgreSQL/PostGIS, RLS dhe Storage privat | Implementuar |
@@ -186,7 +188,7 @@ adresa, foto ose lokacione që identifikojnë persona realë.
 | Shell/hartë publike bazë | Implementuar |
 | Krijimi/lista e raporteve qytetare | Implementuar |
 | Lokacion publik, EXIF, rate limit, duplicate suggestion | Implementuar |
-| Workflow zyrtari, komente operative, njoftime, detaj raporti | Sprint 6 |
+| Panel/workflow zyrtari, komente operative, njoftime, detaj raporti | Implementuar |
 | Administrim, SLA dashboard, audit i zgjeruar, eksport | Sprint 7 |
 | Public detail, filtra, heatmap dhe analitika | Sprint 8 |
 | 25+ teste, accessibility/performance/usability evaluation | Sprint 9 |

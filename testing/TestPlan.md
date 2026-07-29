@@ -40,6 +40,8 @@ Ky plan testimi përshkruan qasjen për të vlerësuar funksionalitetin dhe sigu
 23. **SQL/NoSQL Injection**: Inputet në filtra dhe search duhet të jenë të pastruara.
 24. **Akses i paautorizuar në imazhe**: Sigurimi që imazhet mund të shikohen, por metadata EXIF që zbulon pajisjen dhe lokacionin fshihet para ruajtjes.
 25. **Audit Logs**: Çdo ndryshim i thellë nga administratori regjistrohet dhe është "read-only" në logs.
+26. **Skadimi i Session-it**: Session-i i workspace-it refuzohet një orë pas
+    hyrjes, kërkon ri-autentikim dhe ruan vetëm një destinacion të brendshëm.
 
 ## Vlerësimi Me Përdorues (Usability Testing)
 - Rekrutimi i 5–10 personave vullnetarë.
@@ -50,10 +52,12 @@ Ky plan testimi përshkruan qasjen për të vlerësuar funksionalitetin dhe sigu
 - **Dataset**: `dataset/synthetic_dataset.json` me 120 raporte deterministike.
 - **Mjetet e planifikuara**: Playwright/Vitest për testet e automatizuara, Supabase SQL Editor për RLS dhe testime manuale vizuale. Nuk deklarojmë asnjë test si të kaluar para ekzekutimit të tij.
 
-## Automatizimi aktual para Sprintit 6
+## Automatizimi aktual në Sprintin 6
 
-- `npm test` ekzekuton 37 teste Vitest për password/redirect/RBAC, validimin e
-  raportit, normalizimin e view-t publik dhe heqjen fail-closed të EXIF/GPS.
+- `npm test` ekzekuton 56 teste Vitest për password/redirect/RBAC, skadimin
+  absolut të session-it, përmbledhjet e paneleve, validimin e
+  raportit, workflow-n, normalizimin e view-t publik dhe heqjen fail-closed të
+  EXIF/GPS.
 - `npm run check:dataset` kontrollon që JSON-i me 120 raporte dhe SQL seed-i të
   jenë gjeneruar nga i njëjti burim.
 - `supabase/tests/database/pre_sprint6_hardening.test.sql` mbulon
@@ -61,10 +65,15 @@ Ky plan testimi përshkruan qasjen për të vlerësuar funksionalitetin dhe sigu
   admin policy, RBAC, 120 raportet dhe rate limit-in me 21 assertions.
   Ekzekutohet me
   `npx supabase test db` pasi Supabase lokal/Docker të jetë aktiv.
+- `supabase/tests/database/sprint6_workflow.test.sql` shton 18 assertions për
+  privilegjet, state machine-in, historinë, komentet interne, njoftimet dhe
+  rihapjen. GitHub Actions i ekzekuton të dyja suit-at në Supabase të izoluar.
 - `npm run verify:remote -- --allow-dev` verifikon krijimin e raportit qytetar,
   kufijtë e RPC-së, ndalimin e update-it direkt dhe upload/download-in privat
   e immutable të një prove sintetike në projektin e hostuar.
 - `npm run verify:local-auth -- --allow-dev` verifikon cookie/header-at SSR,
   faqet e autentikuara dhe ndalimin e route-ve `official`/`admin` për qytetarin.
+- `npm run verify:sprint6 -- --allow-dev` ekzekuton ciklin e plotë sintetik
+  official/citizen kundër projektit të hostuar `dev`.
 - Këto kontrolle nuk zëvendësojnë paketën përfundimtare me 25+ skenarë
   funksionalë, të skajeve dhe të sigurisë të Sprintit 9.

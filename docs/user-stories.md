@@ -58,6 +58,16 @@ Kriteret e pranimit:
 - nuk ekspozon lokacionin e saktë në markup;
 - gjendjet empty/error/loading janë të qarta.
 
+Përfundimi UX para Sprintit 7:
+
+- `/citizen` është faqja hyrëse e hapësirës qytetare;
+- paneli shfaq totalin, raportet aktive/të zgjidhura, njoftimet e palexuara,
+  raportimet e fundit dhe çështjen aktive me afatin fillestar më të afërt;
+- `/citizen/reports` ka kërkim sipas titullit, përshkrimit ose numrit dhe
+  filtra të ndarë për aktive, të zgjidhura dhe të refuzuara;
+- navigimi tregon faqen aktive dhe ruan target-e 44 px në desktop/mobile;
+- lokacioni privat nuk futet në përmbledhjen ose kërkimin e panelit.
+
 ## US-05 — Qytetari shmang duplikatet (Sprint 5)
 
 Si qytetar dua të shoh nëse ka problem aktiv të ngjashëm pranë, që të mos
@@ -76,13 +86,24 @@ Kriteret e pranimit:
 Si zyrtar dua të verifikoj, caktoj dhe përditësoj raportet e autorizuara, që
 procesi të dokumentohet deri në zgjidhje.
 
-Kriteret e pranimit të planifikuara:
+Kriteret e pranimit:
 
 - inbox i filtrueshëm vetëm për scope-in e autorizuar;
 - tranzicione vetëm sipas state machine;
 - histori dhe komente immutable;
 - zgjidhja/refuzimi kërkojnë shënim;
 - qytetari merr njoftim dhe hap faqen e detajit të raportit.
+
+Përfundimi UX para Sprintit 7:
+
+- `/official` është faqja hyrëse për zyrtarin dhe administratorin;
+- paneli përmbledh raportet për verifikim, caktimet e zyrtarit, rastet në
+  proces dhe prioritetet `high`/`urgent`;
+- radha e vëmendjes renditet në mënyrë deterministike sipas prioritetit,
+  statusit, pronësisë dhe afatit fillestar;
+- `/official/reports` mbetet inbox-i i plotë i kërkueshëm dhe i filtrueshëm;
+- paneli dhe inbox-i lexojnë vetëm rreshtat që lejon RLS sipas rolit dhe
+  departamentit.
 
 ## US-07 — Administratori menaxhon platformën (Sprint 7)
 

@@ -6,6 +6,9 @@
 - Proxy i kufizuar te route-t e mbrojtura, me role nga `profiles`: `citizen`,
   `official`/`admin` dhe `admin`.
 - PKCE callback, session cookies dhe përgjigje auth me `no-store`.
+- Session-et e workspace-it skadojnë absolutisht një orë pas hyrjes;
+  kontrolli server-side fail-closed plotësohet nga timer-i në browser dhe
+  dalja prek vetëm session-in aktual.
 - Redirect-e vetëm drejt path-eve të brendshme të validuara.
 - Fjalëkalim minimal 10 karaktere me shkronja të mëdha/vogla dhe numër.
 - Security headers: `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, `Cross-Origin-Opener-Policy` dhe HSTS në production.

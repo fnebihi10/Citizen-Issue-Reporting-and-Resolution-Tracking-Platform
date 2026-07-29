@@ -26,7 +26,7 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=PASTE_PUBLISHABLE_KEY_HERE
 ```
 
 Mos e vendos `service_role` key në chat, GitHub, `.env.example` ose në ndonjë
-komponent React. Nuk kërkohet nga Sprintet 1–5; nëse një operacion i ardhshëm
+komponent React. Nuk kërkohet nga Sprintet 1–6; nëse një operacion i ardhshëm
 administrativ e kërkon realisht, përdoret vetëm server-side dhe dokumentohet
 veçmas.
 
@@ -79,17 +79,22 @@ Nëse CLI kërkon database password, përdor password-in që vendose gjatë krij
     i trigger-it të raportit kur llogarit lokacionin publik me helper-in privat;
 11. `20260724235000_enforce_citizen_report_role.sql` — kontrolli i rolit
     autoritativ edhe për insert-et direkte të raportit qytetar.
+12. `20260729143000_sprint6_official_workflow.sql` — workflow atomik i stafit,
+    komentet/rihapja e kontrolluar dhe njoftimet server-side.
 
 Dokumentimi zyrtar: [Supabase database migrations](https://supabase.com/docs/guides/deployment/database-migrations).
 
 Nëse nuk e ke CLI-në, për këtë projekt mund t’i ekzekutosh SQL files në SQL Editor në të njëjtin rend, por më pas duhet ta regjistrojmë gjendjen me CLI që migration history të mos dalë jashtë sinkronizimit.
 
 Për zhvillim lokal, seed-et e renditura në `supabase/config.toml` krijojnë tre
-qytetarë sintetikë dhe 120 raportime nga `dataset/synthetic_dataset.json`.
+qytetarë sintetikë, dy zyrtarë sintetikë, një administrator sintetik dhe 120
+raportime nga `dataset/synthetic_dataset.json`.
 Prej tyre, 104 janë publike dhe lokacioni publik llogaritet nga trigger-i.
 `supabase/seed.sql` ruhet si entry point konvencional; të dhënat janë në
-`supabase/seeds/00_synthetic_users.sql` dhe skedarin e gjeneruar
-`supabase/seeds/synthetic_reports.sql`.
+`supabase/seeds/00_synthetic_users.sql`,
+`supabase/seeds/01_sprint6_staff.sql` dhe skedarin e gjeneruar
+`supabase/seeds/synthetic_reports.sql`. Llogaritë e stafit përdorin vetëm
+adresa `@example.test`; seed-i nuk ndryshon llogaritë reale ekzistuese.
 Seed-i nuk është për production dhe nuk ngarkohet në Supabase Cloud nga një
 `db push` standard. Vetëm në projektin e lidhur `dev` ose `staging`, pasi
 `--dry-run` të kalojë, ngarkoje në mënyrë eksplicite:
@@ -97,6 +102,42 @@ Seed-i nuk është për production dhe nuk ngarkohet në Supabase Cloud nga një
 ```bash
 npx supabase db push --include-seed
 ```
+
+### Rolet dhe krijimi i administratorit të parë
+
+Rolet ruhen në `public.profiles.role`, jo në metadata-n e modifikueshme të
+Supabase Auth. Regjistrimi publik krijon gjithmonë `citizen`; vizitori publik
+është përdorues pa session dhe nuk ka rresht profili.
+
+Për administratorin e parë, krijo ose regjistro fillimisht përdoruesin te
+**Authentication → Users**, pastaj ekzekuto vetëm në SQL Editor të projektit
+`dev`:
+
+```sql
+update public.profiles
+set role = 'admin',
+    department_id = null,
+    updated_at = now()
+where email = 'ADMIN_LOGIN_EMAIL';
+```
+
+Për një zyrtar, cakto edhe departamentin me kodin `DSPI`, `DIM` ose `DTS`:
+
+```sql
+update public.profiles
+set role = 'official',
+    department_id = (
+      select id
+      from public.departments
+      where code = 'DSPI'
+    ),
+    updated_at = now()
+where email = 'OFFICIAL_LOGIN_EMAIL';
+```
+
+Mos e ndrysho rolin te `auth.users.raw_user_meta_data`. Menaxhimi i roleve nga
+ndërfaqja administrative i përket Sprintit 7; SQL-ja e mësipërme përdoret vetëm
+për bootstrap-in e administratorit të parë në `dev`.
 
 ## 5. Çfarë duhet të shohësh pas migrimit
 
@@ -124,6 +165,7 @@ Për një smoke test read-only/deny-path kundër projektit të seed-uar dev:
 
 ```powershell
 npm run verify:remote -- --allow-dev
+npm run verify:sprint6 -- --allow-dev
 ```
 
 Ky kontroll lexon hartën publike, verifikon që RPC-ja refuzohet për anon,
