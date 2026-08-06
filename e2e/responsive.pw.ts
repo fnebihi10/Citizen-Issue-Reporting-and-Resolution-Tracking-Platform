@@ -24,7 +24,7 @@ for (const viewport of viewports) {
       await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
     }
 
-    if (viewport.width < 768) {
+    if (viewport.width < 1024) {
       await page.goto('/');
       const menu = page.getByText('Hap ose mbyll menynë');
       const box = await menu.locator('..').boundingBox();
