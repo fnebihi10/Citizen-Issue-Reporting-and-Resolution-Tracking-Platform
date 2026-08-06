@@ -40,46 +40,20 @@ export default async function AdminDashboardPage() {
   const { supabase, fullName, unreadCount, sessionStartedAt } =
     await requireAdmin('/admin');
   const now = new Date();
-  const dueSoon = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-
   const [
-    users,
-    officials,
+    profiles,
     departments,
     categories,
     activeReports,
-    overdueReports,
-    dueSoonReports,
     recentAudit,
   ] = await Promise.all([
-    supabase.from('profiles').select('id', { count: 'exact', head: true }),
-    supabase
-      .from('profiles')
-      .select('id', { count: 'exact', head: true })
-      .eq('role', 'official'),
-    supabase
-      .from('departments')
-      .select('id', { count: 'exact', head: true })
-      .eq('is_active', true),
-    supabase
-      .from('categories')
-      .select('id', { count: 'exact', head: true })
-      .eq('is_active', true),
+    supabase.from('profiles').select('id, role'),
+    supabase.from('departments').select('id').eq('is_active', true),
+    supabase.from('categories').select('id').eq('is_active', true),
     supabase
       .from('reports')
-      .select('id', { count: 'exact', head: true })
+      .select('id, sla_due_at')
       .not('status', 'in', '(resolved,rejected)'),
-    supabase
-      .from('reports')
-      .select('id', { count: 'exact', head: true })
-      .not('status', 'in', '(resolved,rejected)')
-      .lt('sla_due_at', now.toISOString()),
-    supabase
-      .from('reports')
-      .select('id', { count: 'exact', head: true })
-      .not('status', 'in', '(resolved,rejected)')
-      .gte('sla_due_at', now.toISOString())
-      .lte('sla_due_at', dueSoon.toISOString()),
     supabase
       .from('audit_logs')
       .select('id, action, actor_id, entity_type, entity_id, details, created_at')
@@ -88,15 +62,21 @@ export default async function AdminDashboardPage() {
   ]);
 
   const hasLoadError = [
-    users,
-    officials,
+    profiles,
     departments,
     categories,
     activeReports,
-    overdueReports,
-    dueSoonReports,
     recentAudit,
   ].some((result) => result.error);
+  const nowMs = now.getTime();
+  const dueSoonMs = nowMs + 24 * 60 * 60 * 1000;
+  const overdueCount = (activeReports.data ?? []).filter(
+    (report) => new Date(report.sla_due_at).getTime() < nowMs,
+  ).length;
+  const dueSoonCount = (activeReports.data ?? []).filter((report) => {
+    const dueAt = new Date(report.sla_due_at).getTime();
+    return dueAt >= nowMs && dueAt <= dueSoonMs;
+  }).length;
 
   return (
     <div className="min-h-screen">
@@ -163,34 +143,34 @@ export default async function AdminDashboardPage() {
         ) : null}
 
         <section
-          className="mt-5 grid grid-cols-2 gap-3 lg:grid-cols-4"
+          className="mt-5 grid grid-cols-1 gap-3 min-[380px]:grid-cols-2 lg:grid-cols-4"
           aria-label="Përmbledhja administrative"
         >
           <AdminMetric
             label="Përdorues"
-            value={users.count ?? 0}
-            detail={`${officials.count ?? 0} zyrtarë komunalë`}
+            value={profiles.data?.length ?? 0}
+            detail={`${profiles.data?.filter((profile) => profile.role === 'official').length ?? 0} zyrtarë komunalë`}
             icon={Users}
             iconClassName="bg-blue-50 text-blue-700"
           />
           <AdminMetric
             label="Struktura aktive"
-            value={departments.count ?? 0}
-            detail={`${categories.count ?? 0} kategori aktive`}
+            value={departments.data?.length ?? 0}
+            detail={`${categories.data?.length ?? 0} kategori aktive`}
             icon={Layers3}
             iconClassName="bg-violet-50 text-violet-700"
           />
           <AdminMetric
             label="Raportime aktive"
-            value={activeReports.count ?? 0}
+            value={activeReports.data?.length ?? 0}
             detail="jashtë statuseve të mbyllura"
             icon={Activity}
             iconClassName="bg-emerald-50 text-emerald-700"
           />
           <AdminMetric
             label="Jashtë afatit"
-            value={overdueReports.count ?? 0}
-            detail={`${dueSoonReports.count ?? 0} skadojnë brenda 24 orëve`}
+            value={overdueCount}
+            detail={`${dueSoonCount} skadojnë brenda 24 orëve`}
             icon={ClockAlert}
             iconClassName="bg-rose-50 text-rose-700"
           />

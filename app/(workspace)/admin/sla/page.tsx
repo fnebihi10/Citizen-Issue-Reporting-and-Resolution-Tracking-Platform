@@ -17,14 +17,26 @@ import { getSlaState, hoursUntilDeadline } from '@/lib/admin/sla';
 import { requireAdmin } from '@/lib/admin/server';
 import { formatDate } from '@/lib/utils';
 import type {
-  CitizenReportListItem,
+  Report,
   ReportPriority,
 } from '@/types/database';
 
 export const dynamic = 'force-dynamic';
 
 const reportColumns =
-  'id, report_number, title, description, category_id, department_id, assigned_official_id, citizen_id, status, priority, address_text, sla_due_at, is_public, public_title, public_summary, resolution_notes, rejected_reason, resolved_at, created_at, updated_at';
+  'id, report_number, title, category_id, department_id, status, priority, sla_due_at';
+
+type SlaReport = Pick<
+  Report,
+  | 'id'
+  | 'report_number'
+  | 'title'
+  | 'category_id'
+  | 'department_id'
+  | 'status'
+  | 'priority'
+  | 'sla_due_at'
+>;
 
 const priorityLabels: Record<ReportPriority, string> = {
   low: 'I ulët',
@@ -49,7 +61,6 @@ export default async function AdminSlaPage({
   const { supabase, unreadCount, sessionStartedAt } =
     await requireAdmin('/admin/sla');
   const now = new Date();
-  const nextDay = new Date(now.getTime() + 24 * 60 * 60 * 1000);
   const requestedState = firstValue(params.state);
   const state = ['overdue', 'due-soon', 'on-track'].includes(
     requestedState ?? '',
@@ -58,57 +69,34 @@ export default async function AdminSlaPage({
     : 'overdue';
   const department = firstValue(params.department) ?? '';
 
-  let queueQuery = supabase
-    .from('reports')
-    .select(reportColumns)
-    .not('status', 'in', '(resolved,rejected)')
-    .order('sla_due_at', { ascending: true })
-    .limit(100);
-  if (state === 'overdue') {
-    queueQuery = queueQuery.lt('sla_due_at', now.toISOString());
-  } else if (state === 'due-soon') {
-    queueQuery = queueQuery
-      .gte('sla_due_at', now.toISOString())
-      .lte('sla_due_at', nextDay.toISOString());
-  } else {
-    queueQuery = queueQuery.gt('sla_due_at', nextDay.toISOString());
-  }
-  if (department) queueQuery = queueQuery.eq('department_id', department);
-
   const [
     { data: reportRows, error: reportsError },
     { data: categories },
     { data: departments },
-    activeCount,
-    overdueCount,
-    dueSoonCount,
-    onTrackCount,
   ] = await Promise.all([
-    queueQuery,
+    supabase
+      .from('reports')
+      .select(reportColumns)
+      .not('status', 'in', '(resolved,rejected)')
+      .order('sla_due_at', { ascending: true }),
     supabase.from('categories').select('id, name').order('name'),
     supabase.from('departments').select('id, name').order('name'),
-    supabase
-      .from('reports')
-      .select('id', { count: 'exact', head: true })
-      .not('status', 'in', '(resolved,rejected)'),
-    supabase
-      .from('reports')
-      .select('id', { count: 'exact', head: true })
-      .not('status', 'in', '(resolved,rejected)')
-      .lt('sla_due_at', now.toISOString()),
-    supabase
-      .from('reports')
-      .select('id', { count: 'exact', head: true })
-      .not('status', 'in', '(resolved,rejected)')
-      .gte('sla_due_at', now.toISOString())
-      .lte('sla_due_at', nextDay.toISOString()),
-    supabase
-      .from('reports')
-      .select('id', { count: 'exact', head: true })
-      .not('status', 'in', '(resolved,rejected)')
-      .gt('sla_due_at', nextDay.toISOString()),
   ]);
-  const reports: CitizenReportListItem[] = reportRows ?? [];
+  const activeReports: SlaReport[] = reportRows ?? [];
+  const reports = activeReports
+    .filter((report) => getSlaState(report.status, report.sla_due_at, now) === state)
+    .filter((report) => !department || report.department_id === department)
+    .slice(0, 100);
+  const slaCounts = activeReports.reduce(
+    (counts, report) => {
+      const reportState = getSlaState(report.status, report.sla_due_at, now);
+      if (reportState === 'overdue') counts.overdue += 1;
+      if (reportState === 'due-soon') counts.dueSoon += 1;
+      if (reportState === 'on-track') counts.onTrack += 1;
+      return counts;
+    },
+    { overdue: 0, dueSoon: 0, onTrack: 0 },
+  );
   const categoryNames = new Map(
     (categories ?? []).map((category) => [category.id, category.name]),
   );
@@ -123,7 +111,7 @@ export default async function AdminSlaPage({
         unreadCount={unreadCount}
         sessionStartedAt={sessionStartedAt}
       />
-      <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
+      <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
         <AdminPageHeader
           eyebrow="Monitorimi operacional"
           title="Afatet e shërbimit"
@@ -136,33 +124,33 @@ export default async function AdminSlaPage({
         />
 
         <section
-          className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4"
+          className="mt-6 grid grid-cols-1 gap-3 min-[380px]:grid-cols-2 lg:grid-cols-4"
           aria-label="Gjendja e SLA-së"
         >
           <AdminMetric
             label="Aktive"
-            value={activeCount.count ?? 0}
+            value={activeReports.length}
             detail="raportime të hapura"
             icon={Activity}
             iconClassName="bg-blue-50 text-blue-700"
           />
           <AdminMetric
             label="Jashtë afatit"
-            value={overdueCount.count ?? 0}
+            value={slaCounts.overdue}
             detail="kërkojnë ndërhyrje"
             icon={ClockAlert}
             iconClassName="bg-rose-50 text-rose-700"
           />
           <AdminMetric
             label="Brenda 24 orëve"
-            value={dueSoonCount.count ?? 0}
+            value={slaCounts.dueSoon}
             detail="afër skadimit"
             icon={Clock3}
             iconClassName="bg-amber-50 text-amber-700"
           />
           <AdminMetric
             label="Në afat"
-            value={onTrackCount.count ?? 0}
+            value={slaCounts.onTrack}
             detail="më shumë se 24 orë"
             icon={CheckCircle2}
             iconClassName="bg-emerald-50 text-emerald-700"
@@ -171,10 +159,12 @@ export default async function AdminSlaPage({
 
         <form
           method="get"
-          className="mt-5 grid gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto]"
+          className="mt-5 grid gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] sm:items-end"
         >
           <label>
-            <span className="sr-only">Gjendja e afatit</span>
+            <span className="mb-1.5 block text-xs font-bold uppercase tracking-[0.1em] text-slate-500">
+              Gjendja e afatit
+            </span>
             <select name="state" defaultValue={state} className="field-input h-11">
               <option value="overdue">Jashtë afatit</option>
               <option value="due-soon">Skadojnë brenda 24 orëve</option>
@@ -182,7 +172,9 @@ export default async function AdminSlaPage({
             </select>
           </label>
           <label>
-            <span className="sr-only">Departamenti</span>
+            <span className="mb-1.5 block text-xs font-bold uppercase tracking-[0.1em] text-slate-500">
+              Departamenti
+            </span>
             <select
               name="department"
               defaultValue={department}
@@ -196,7 +188,13 @@ export default async function AdminSlaPage({
               ))}
             </select>
           </label>
-          <button type="submit" className={buttonVariantsClass({ variant: 'secondary' })}>
+          <button
+            type="submit"
+            className={buttonVariantsClass({
+              variant: 'secondary',
+              className: 'w-full sm:w-auto',
+            })}
+          >
             <Filter className="h-4 w-4" aria-hidden="true" />
             Filtro
           </button>
@@ -234,7 +232,7 @@ export default async function AdminSlaPage({
                 const reportState = getSlaState(report.status, report.sla_due_at, now);
                 const hours = hoursUntilDeadline(report.sla_due_at, now);
                 return (
-                  <Card key={report.id} className="p-5 shadow-sm">
+                  <Card key={report.id} className="p-4 shadow-sm sm:p-5">
                     <div className="flex min-w-0 flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                       <div className="min-w-0">
                         <div className="flex flex-wrap items-center gap-2">
@@ -247,7 +245,7 @@ export default async function AdminSlaPage({
                           </span>
                           <SlaBadge state={reportState} hours={hours} />
                         </div>
-                        <h3 className="mt-2 truncate font-black text-slate-950">
+                        <h3 className="mt-2 break-words font-black text-slate-950 sm:truncate">
                           {report.title}
                         </h3>
                         <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs leading-5 text-slate-500">
@@ -265,7 +263,10 @@ export default async function AdminSlaPage({
                       </div>
                       <Link
                         href={`/official/reports/${report.id}`}
-                        className={buttonVariantsClass({ variant: 'secondary' })}
+                        className={buttonVariantsClass({
+                          variant: 'secondary',
+                          className: 'w-full lg:w-auto',
+                        })}
                       >
                         Hape rastin
                         <ArrowRight className="h-4 w-4" aria-hidden="true" />

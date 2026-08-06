@@ -30,6 +30,9 @@ export function ReportForm({ categories }: { categories: Category[] }) {
   const router = useRouter();
   const supabase = useMemo(() => createClient(), []);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const similarLookupCache = useRef(
+    new Map<string, SimilarReportSuggestion[]>(),
+  );
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [categoryId, setCategoryId] = useState('');
@@ -64,8 +67,20 @@ export function ReportForm({ categories }: { categories: Category[] }) {
 
   useEffect(() => {
     let cancelled = false;
+    const abortController = new AbortController();
 
     if (!categoryId || !coordinates || !similarLookupKey) return;
+
+    const cachedReports = similarLookupCache.current.get(similarLookupKey);
+    if (cachedReports) {
+      setSimilarLookup({
+        key: similarLookupKey,
+        reports: cachedReports,
+        error: null,
+        loading: false,
+      });
+      return;
+    }
 
     const timeoutId = window.setTimeout(async () => {
       if (cancelled) return;
@@ -76,15 +91,19 @@ export function ReportForm({ categories }: { categories: Category[] }) {
         loading: true,
       });
 
-      const { data, error: suggestionsError } = await supabase.rpc(
-        'suggest_similar_reports',
-        {
-          p_category_id: categoryId,
-          p_latitude: coordinates.latitude,
-          p_longitude: coordinates.longitude,
-          p_radius_m: 500,
-        },
+      const requestTimeoutId = window.setTimeout(
+        () => abortController.abort('similar-report-timeout'),
+        3_000,
       );
+      const { data, error: suggestionsError } = await supabase
+        .rpc('suggest_similar_reports', {
+            p_category_id: categoryId,
+            p_latitude: coordinates.latitude,
+            p_longitude: coordinates.longitude,
+            p_radius_m: 500,
+          })
+        .abortSignal(abortController.signal);
+      window.clearTimeout(requestTimeoutId);
 
       if (cancelled) return;
 
@@ -99,17 +118,19 @@ export function ReportForm({ categories }: { categories: Category[] }) {
         return;
       }
 
+      similarLookupCache.current.set(similarLookupKey, data ?? []);
       setSimilarLookup({
         key: similarLookupKey,
         reports: data ?? [],
         error: null,
         loading: false,
       });
-    }, 450);
+    }, 250);
 
     return () => {
       cancelled = true;
       window.clearTimeout(timeoutId);
+      abortController.abort('similar-report-selection-changed');
     };
   }, [categoryId, coordinates, similarLookupKey, supabase]);
 

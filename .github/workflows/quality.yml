@@ -46,6 +46,11 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Browser quality, accessibility, and performance
+        env:
+          PLAYWRIGHT_PRODUCTION: 1
+        run: npm run test:e2e
+
   database:
     name: Database security tests
     runs-on: ubuntu-latest
