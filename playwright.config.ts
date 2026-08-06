@@ -26,7 +26,7 @@ export default defineConfig({
     locale: 'sq-AL',
     screenshot: 'only-on-failure',
     trace: 'retain-on-failure',
-    video: 'retain-on-failure',
+    video: 'off',
   },
   webServer: {
     command: isProductionServer
