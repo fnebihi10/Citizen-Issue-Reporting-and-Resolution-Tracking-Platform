@@ -128,9 +128,16 @@ Kriteret e pranimit të implementuara:
 Si vizitor dua filtra, faqe publike raporti, statistika dhe heatmap, që të
 kuptoj performancën pa parë të dhëna private.
 
-Kriteret e pranimit të planifikuara:
+Kriteret e pranimit të implementuara:
 
-- faqja publike përdor vetëm views të sanitizuara;
-- filtrat nuk zbulojnë ekzistencën e raporteve private;
-- heatmap përdor lokacione të përgjithësuara;
-- historiku publik përjashton autorët dhe shënimet e brendshme.
+- `/map` ofron kërkim dhe filtra sipas kategorisë, statusit dhe periudhës;
+- `/reports/[id]` shfaq përmbledhjen, faktet, historikun dhe komentet publike;
+- faqet publike përdorin vetëm `public_reports`,
+  `public_report_comments` dhe `public_report_status_history`;
+- një ID private ose e panjohur jep të njëjtën gjendje “nuk u gjet”, pa
+  zbuluar ekzistencën e raportit privat;
+- mënyra e dendësisë grupon vetëm koordinatat e përgjithësuara;
+- historiku publik përjashton identitetin e autorit, shënimet e tranzicionit
+  dhe komentet e brendshme;
+- `/admin/analytics` përdor të njëjtin dataset të sanitizuar për statistika,
+  shpërndarje dhe hartë dendësie.

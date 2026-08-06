@@ -6,12 +6,14 @@ Titulli i punimit: **Zhvillimi i një platforme për raportimin, ndjekjen dhe zg
 
 ## Gjendja aktuale
 
-Sprintet 1–7 janë të implementuara në nivel aplikacioni dhe databaze:
+Sprintet 1–8 janë të implementuara në nivel aplikacioni dhe databaze:
 
 - arkitekturë, standarde të kodit dhe design system responsive;
 - Supabase me PostgreSQL/PostGIS, migrations, RLS, private Storage dhe views publike të sanitizuara;
 - autentikim me email/password, konfirmim email-i, PKCE callback, reset password, profil qytetari dhe mbrojtje të route-ve;
-- shell publik responsive me hartë publike, gjendje loading/empty/error dhe navigim për desktop/mobile;
+- transparencë publike responsive me hartë, kërkim/filtra, statistika,
+  vizualizim të pikave ose dendësisë dhe faqe publike raporti pa të dhëna
+  personale;
 - panel qytetar responsive me përmbledhje, veprimin e radhës, njoftime të
   palexuara, kërkim/filtra dhe listën “raportimet e mia”;
 - krijim raportimi qytetar me kategori, validim, lokacion në hartë dhe
@@ -26,6 +28,9 @@ Sprintet 1–7 janë të implementuara në nivel aplikacioni dhe databaze:
 - panel administrativ responsive me menaxhim rolesh/departamentesh, kategori
   dhe SLA, monitorim të vonesave, audit log vetëm për lexim dhe eksporte
   CSV/JSON pa të dhëna personale;
+- analitikë administrative privacy-safe me filtra, shpërndarje sipas
+  statusit/kategorisë dhe hartë dendësie të bazuar vetëm në koordinatat e
+  përgjithësuara publike;
 - dataset dhe seed databaze të sinkronizuar me 120 raporte sintetike, prej të
   cilave 104 publike me lokacion server-side të përgjithësuar;
 - Next.js 16.2.11, React 19, Turbopack default, TypeScript strict dhe ESLint flat config;
@@ -121,6 +126,8 @@ Lexo [udhëzuesin e Supabase](docs/supabase-setup.md) dhe [checklistën e autent
 - [Baza e sigurisë](docs/security-baseline.md)
 - [Verifikimi i Sprintit 6](docs/sprint-6-verification.md)
 - [Verifikimi i Sprintit 7](docs/sprint-7-verification.md)
+- [Verifikimi i Sprintit 8](docs/sprint-8-verification.md)
+- [Plani i testimit](docs/test-plan.md)
 - [Diagramet autoritative](diagrams/README.md)
 - [Roadmap](docs/roadmap.md)
 

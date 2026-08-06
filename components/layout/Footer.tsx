@@ -27,7 +27,7 @@ export function Footer() {
             <div className="mt-4 space-y-3 text-sm">
               <Link href="/#si-funksionon" className="block w-fit text-slate-300 transition-colors hover:text-white">Si funksionon</Link>
               <Link href="/#per-platformen" className="block w-fit text-slate-300 transition-colors hover:text-white">Për platformën</Link>
-              <Link href="/map" className="block w-fit text-slate-300 transition-colors hover:text-white">Harta publike</Link>
+              <Link href="/map" className="block w-fit text-slate-300 transition-colors hover:text-white">Transparenca publike</Link>
               <Link href="/citizen/report" className="block w-fit text-slate-300 transition-colors hover:text-white">Raporto problem</Link>
               <Link href="/login" className="block w-fit text-slate-300 transition-colors hover:text-white">Hyr në llogari</Link>
             </div>

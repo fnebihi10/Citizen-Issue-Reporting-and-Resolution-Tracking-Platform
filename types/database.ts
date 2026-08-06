@@ -62,6 +62,14 @@ export interface PublicReportComment {
   created_at: string;
 }
 
+export interface PublicReportStatusHistory {
+  id: string;
+  report_id: string;
+  previous_status: ReportStatus | null;
+  new_status: ReportStatus;
+  created_at: string;
+}
+
 export type ReportAttachment = Tables<'report_attachments'>;
 export type Notification = Tables<'notifications'>;
 export type AuditLog = Tables<'audit_logs'>;
