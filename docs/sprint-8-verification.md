@@ -61,8 +61,14 @@ Chrome u ekzekutua me device metrics reale në viewport-et 390×844, 430×932,
 - navigimi mobile u shfaq në viewport-et e vogla;
 - nuk u gjet horizontal overflow.
 
-## Statusi i mbylljes
+## GitHub Actions dhe statusi i mbylljes
 
-Sprinti 8 është gati për commit/push dhe verifikim në GitHub Actions. Mbyllja
-e branch-it kërkon që job-et **application quality** dhe **database security**
-të kalojnë në PR; rezultatet e tyre regjistrohen pas push-it.
+- commit-i i implementimit: `919506b` (`feat: complete Sprint 8 public transparency`);
+- branch-i: `agent/sprint-8-closure`;
+- draft PR: `#2` drejt `main`;
+- workflow run `31100700433`:
+  - `validate` — passed në 1m01s;
+  - `Database security tests` — passed në 2m41s.
+
+Sprinti 8 është i mbyllur teknikisht dhe gati për review/merge. Të gjitha
+provat lokale, migration-i remote dhe të dy job-et e GitHub Actions janë green.
