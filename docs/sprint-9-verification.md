@@ -28,6 +28,15 @@ Verification date: **6 August 2026**
 | Authenticated SLA Playwright run | **PASS — 1 passed** |
 | Supabase/pgTAP | **PASS — 5 files, 83/83 assertions** |
 
+## GitHub Actions confirmation
+
+PR #3 was independently verified on commit `c13bc88` by GitHub Actions run
+`31107858264`:
+
+- `validate` — **PASS** in 1m20s, including the production build and browser suite;
+- `Database security tests` — **PASS** in 2m43s, including the isolated
+  Supabase stack and all 83 pgTAP assertions.
+
 ## Responsive and accessibility coverage
 
 - no horizontal overflow on the landing and login screens at 390×844, 430×932,
