@@ -1,7 +1,8 @@
 # Diagramet autoritative
 
 Diagramet Mermaid më poshtë pasqyrojnë migrations dhe kodin real pas Sprintit
-7, duke përfshirë panelet qytetar/zyrtar/admin. Skedarët e vjetër PNG/Draw.io
+8, duke përfshirë panelet qytetar/zyrtar/admin dhe transparencën publike.
+Skedarët e vjetër PNG/Draw.io
 në këtë dosje ruhen si drafte historike të
 paketës fillestare; ata nuk përdoren si burim i së vërtetës kur devijojnë nga
 ky dokument.
@@ -50,9 +51,9 @@ flowchart LR
   admin --> export
 ```
 
-`comment`, `officialOverview`, `verify`, `assign`, `workflow`, `manage`,
-monitorimi i SLA/auditit dhe `export` janë implementuar. Statistikat publike,
-heatmap dhe `publicReport` i plotë mbeten pjesë e Sprintit 8.
+Të gjitha rastet e përdorimit të paraqitura më sipër janë implementuar deri në
+Sprintin 8. Vizualizimi publik/administrativ i dendësisë përdor vetëm
+koordinata publike të përgjithësuara.
 
 ## State diagram i raportit
 
@@ -224,6 +225,27 @@ sequenceDiagram
     DB->>DB: Verifikon admin dhe shkruan audit log
     Next-->>Admin: Skedar pa identitet/lokacion privat
   end
+```
+
+## Sequence diagram — transparenca publike
+
+```mermaid
+sequenceDiagram
+  actor Visitor as Vizitori
+  participant Next as Next.js public routes
+  participant Cache as Cache 30-sekondëshe
+  participant DB as Views publike / RLS
+
+  Visitor->>Next: Hap /map ose /reports/[id]
+  Next->>Cache: Kërkon datasetin publik të sanitizuar
+  alt Cache miss
+    Cache->>DB: SELECT public_reports/comments/history
+    DB->>DB: security_barrier + is_public + public_location
+    DB-->>Cache: Vetëm kontrata publike
+  end
+  Cache-->>Next: Raportet, historiku dhe komentet publike
+  Next->>Next: Filtron dhe agregaton koordinatat e përgjithësuara
+  Next-->>Visitor: Hartë/listë/statistika ose “nuk u gjet”
 ```
 
 ## Sequence diagram — krijimi i raportit

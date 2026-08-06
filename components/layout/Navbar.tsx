@@ -5,7 +5,7 @@ import { buttonVariantsClass } from '@/components/ui/button';
 const navigation = [
   { href: '/#si-funksionon', label: 'Si funksionon' },
   { href: '/#per-platformen', label: 'Për platformën' },
-  { href: '/map', label: 'Harta publike' },
+  { href: '/map', label: 'Transparenca' },
 ];
 
 export function Navbar() {

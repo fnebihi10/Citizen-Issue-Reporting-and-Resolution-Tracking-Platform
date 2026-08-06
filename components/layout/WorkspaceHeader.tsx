@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import {
   Activity,
+  BarChart3,
   Bell,
   ClipboardList,
   FilePlus2,
@@ -37,6 +38,7 @@ const officialNavigation = [
 
 const adminNavigation = [
   { href: '/admin', label: 'Përmbledhja', icon: LayoutDashboard, exact: true },
+  { href: '/admin/analytics', label: 'Analitika', icon: BarChart3, exact: false },
   { href: '/admin/users', label: 'Përdoruesit', icon: Users, exact: false },
   { href: '/admin/structure', label: 'Struktura', icon: FolderCog, exact: false },
   { href: '/admin/sla', label: 'SLA', icon: Activity, exact: false },

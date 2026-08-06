@@ -19,6 +19,9 @@
 - Header-i identifikues `X-Powered-By` është çaktivizuar.
 - RLS për profile, raporte, komente, attachments, njoftime dhe audit logs.
 - Views publike të kufizuara vetëm te raporte të publikuara; bucket i provave është privat dhe immutable.
+- Views publike janë `security_barrier`, kanë kontratë eksplicite pa fusha
+  identiteti/private dhe janë burimi i vetëm për filtrat, faqen publike të
+  raportit, statistikat dhe hartën e dendësisë.
 - Lokacioni publik gjenerohet server-side në grid 500 m dhe nuk pranon
   koordinatë publike të kontrolluar nga klienti.
 - Fotografitë dekodohen dhe ri-enkodohen në browser para upload-it; nëse
@@ -46,6 +49,9 @@
   aktiv dhe departamenti me zyrtarë nuk mund të çaktivizohet para ricaktimit.
 - Eksportet administrative përdorin allowlist fushash operative, përjashtojnë
   të dhënat personale/private dhe regjistrohen para shkarkimit.
+- ID-të private dhe të panjohura japin të njëjtën faqe publike “nuk u gjet”;
+  komentet publike përdorin vetëm etiketa gjenerike roli dhe historiku publik
+  nuk përmban aktorë ose shënime të brendshme.
 
 ## Konfigurime manuale para deploy-it
 

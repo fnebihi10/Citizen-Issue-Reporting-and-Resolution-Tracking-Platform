@@ -1,4 +1,4 @@
-# Modeli i databazës — Sprintet 2–7
+# Modeli i databazës — Sprintet 2–8
 
 ## Entitetet
 
@@ -61,6 +61,19 @@ faqet publike përdorin views që filtrohen te `is_public = true` dhe nuk
 përmbajnë `citizen_id`, email, telefon, `author_id` ose lokacionin privat.
 Fotografitë ruhen në bucket privat; objektet e brendshme nuk mund të lexohen
 nga qytetari.
+
+Sprinti 8 e formalizon kontratën publike përmes tre views me
+`security_barrier`:
+
+- `public_reports` — vetëm raportet publike me koordinatë të përgjithësuar;
+- `public_report_comments` — vetëm komentet jo-interne me etiketa gjenerike
+  të rolit, pa `author_id`;
+- `public_report_status_history` — vetëm ndryshimi i statusit dhe koha, pa
+  aktor, shënim intern ose arsye private.
+
+Indeksi parcial `reports_public_transparency_idx` mbështet filtrimin e
+raporteve publike sipas kohës, statusit dhe kategorisë. Harta e dendësisë
+agregon koordinatat e dala nga view; ajo nuk lexon kurrë `reports.location`.
 
 RPC-ja `suggest_similar_reports` është `security definer`, por mund të
 ekzekutohet vetëm nga `authenticated`. Për raportet e qytetarëve të tjerë ajo

@@ -1,6 +1,6 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { getWorkspaceRequestContext } from '@/lib/auth/serverContext';
@@ -141,6 +141,7 @@ export async function transitionOfficialReport(formData: FormData) {
   revalidatePath('/official/reports');
   revalidatePath(detailPath);
   revalidatePath('/notifications');
+  revalidateTag('public-transparency', 'max');
   redirect(outcomeUrl(detailPath, 'success', 'Workflow-i u përditësua me sukses.'));
 }
 
@@ -197,6 +198,7 @@ async function addComment(
 
   revalidatePath(detailPath);
   revalidatePath('/notifications');
+  revalidateTag('public-transparency', 'max');
   redirect(outcomeUrl(detailPath, 'success', 'Komenti u shtua.'));
 }
 
@@ -251,6 +253,7 @@ export async function reopenCitizenReport(formData: FormData) {
   revalidatePath('/citizen/reports');
   revalidatePath(detailPath);
   revalidatePath('/notifications');
+  revalidateTag('public-transparency', 'max');
   redirect(outcomeUrl(detailPath, 'success', 'Raportimi u rihap dhe ekipi u njoftua.'));
 }
 

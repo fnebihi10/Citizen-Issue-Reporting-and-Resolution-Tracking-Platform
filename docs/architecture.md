@@ -19,7 +19,8 @@ Next.js 16 (Vercel planifikohet në Sprintin 10)
 
 ## Organizimi i aplikacionit
 
-- `app/(marketing)` — faqja publike dhe chrome publik.
+- `app/(marketing)` — faqja publike, transparenca në `/map`, detaji i
+  sanitizuar në `/reports/[id]` dhe chrome publik.
 - `app/(auth)` — Login, Register, reset password dhe PKCE callback; nuk trashëgon navbar/footer publik.
 - `app/(workspace)` — route-t e mbrojtura për panelet qytetar/zyrtar/admin,
   raportimet qytetare, llogarinë, inbox-in/detajin zyrtar, njoftimet dhe
@@ -28,9 +29,10 @@ Next.js 16 (Vercel planifikohet në Sprintin 10)
 - `lib/auth` — validimi i fjalëkalimit, mesazhet e kontrolluara dhe redirect-et e sigurta.
 - `lib/supabase` — klientë browser/server të tipizuar nga
   `types/supabase.ts` dhe rifreskimi i session-it.
-- `lib/reports` — validimi, sanitizimi fail-closed i fotografive dhe
-  normalizimi i të dhënave publike; përmbledhja dhe filtrimi i panelit qytetar
-  mbeten funksione të pastra të testueshme.
+- `lib/reports` — validimi, sanitizimi fail-closed i fotografive,
+  normalizimi/filtrimi/agregimi i të dhënave publike dhe cache server-side
+  30-sekondëshe për views e transparencës; përmbledhja dhe filtrimi i panelit
+  qytetar mbeten funksione të pastra të testueshme.
 - `lib/workflow` — state machine dhe validimi i inputeve të Sprintit 6.
   Përmbledhja dhe renditja e radhës operative të panelit zyrtar janë funksione
   të pastra të testueshme dhe nuk anashkalojnë RLS-në.
@@ -46,6 +48,9 @@ Next.js 16 (Vercel planifikohet në Sprintin 10)
 - Roli ruhet te `profiles`, jo te user metadata e kontrollueshme nga klienti.
 - Views publike nxjerrin vetëm të dhëna të sanitizuara të raporteve të
   publikuara; koordinata publike llogaritet nga trigger-i, jo nga browser-i.
+- Harta, detaji dhe analitika publike përdorin një klient anonim pa session
+  persistence dhe cache të etiketuar; ndryshimet e workflow-t e
+  rivlerësojnë etiketën pa futur të dhëna private në cache.
 - `proxy.ts` prek vetëm route-t e mbrojtura, verifikon JWT-në me
   `auth.getClaims()` dhe ngarkon kontekstin autoritativ të session-it, profilit
   dhe njoftimeve me një RPC të vetëm. Header-at e brendshëm pastrohen dhe

@@ -26,9 +26,8 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=PASTE_PUBLISHABLE_KEY_HERE
 ```
 
 Mos e vendos `service_role` key në chat, GitHub, `.env.example` ose në ndonjë
-komponent React. Nuk kërkohet nga Sprintet 1–6; nëse një operacion i ardhshëm
-administrativ e kërkon realisht, përdoret vetëm server-side dhe dokumentohet
-veçmas.
+komponent React. Nuk kërkohet nga Sprintet 1–8; operacionet aktuale përdorin
+session-in, RLS/RPC-të dhe klientin anonim për transparencën publike.
 
 ## 3. Aktivizo PostGIS
 
@@ -86,6 +85,9 @@ Nëse CLI kërkon database password, përdor password-in që vendose gjatë krij
 14. `20260729213000_request_context_performance.sql` — konteksti i mbrojtur i
     kërkesës që bashkon kontrollin e session-it, profilit dhe njoftimeve në një
     RPC për route-t e workspace-it.
+15. `20260730100000_sprint8_public_transparency.sql` — kontrata e sanitizuar
+    e views publike, `security_barrier`, privilegjet anon dhe indeksi parcial
+    për filtrat/analitikën e transparencës.
 
 Dokumentimi zyrtar: [Supabase database migrations](https://supabase.com/docs/guides/deployment/database-migrations).
 

@@ -180,7 +180,7 @@ adresa, foto ose lokacione që identifikojnë persona realë.
 
 ## 6. Gjendja sipas roadmap-it
 
-| Fusha | Gjendja pas Sprintit 7 |
+| Fusha | Gjendja pas Sprintit 8 |
 |---|---|
 | Foundation, arkitekturë dhe design system | Implementuar |
 | PostgreSQL/PostGIS, RLS dhe Storage privat | Implementuar |
@@ -190,6 +190,6 @@ adresa, foto ose lokacione që identifikojnë persona realë.
 | Lokacion publik, EXIF, rate limit, duplicate suggestion | Implementuar |
 | Panel/workflow zyrtari, komente operative, njoftime, detaj raporti | Implementuar |
 | Administrim, SLA dashboard, audit i zgjeruar, eksport | Implementuar |
-| Public detail, filtra, heatmap dhe analitika | Sprint 8 |
+| Public detail, filtra, dendësi/heatmap dhe analitika | Implementuar |
 | 25+ teste, accessibility/performance/usability evaluation | Sprint 9 |
 | Deploy dhe paketa finale e tezës | Sprint 10 |

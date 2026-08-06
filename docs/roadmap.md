@@ -33,9 +33,12 @@ vonesat, audit log dhe eksportet CSV/JSON privacy-safe. Çdo ndryshim i
 ndjeshëm auditohet nga databaza dhe route-t `/admin/*` kërkojnë rolin
 autoritativ `admin`.
 
-## Sprint 8 — Public transparency & analytics
+## Sprint 8 — Public transparency & analytics (implementuar)
 
-Faqja publike e raportit, filtrat, cluster/heatmap, statistika dhe redaktimi i lokacionit publik.
+Faqja publike e raportit, kërkimi dhe filtrat, statistikat, vizualizimi i
+pikave/dendësisë dhe paneli administrativ i analitikës. Të gjitha pamjet
+publike lexojnë vetëm views të sanitizuara dhe lokacionin e përgjithësuar nga
+serveri; lokacioni publik nuk redaktohet nga klienti.
 
 ## Sprint 9 — Quality, security & evaluation
 
