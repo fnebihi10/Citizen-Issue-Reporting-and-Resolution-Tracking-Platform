@@ -23,7 +23,7 @@ export function Navbar() {
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-1 md:flex" aria-label="Navigimi kryesor">
+        <nav className="hidden items-center gap-1 lg:flex" aria-label="Navigimi kryesor">
           {navigation.map((item) => (
             <Link
               key={item.href}
@@ -35,7 +35,7 @@ export function Navbar() {
           ))}
         </nav>
 
-        <div className="hidden items-center gap-2 md:flex">
+        <div className="hidden items-center gap-2 lg:flex">
           <Link href="/citizen/report" className="inline-flex h-11 items-center rounded-lg px-3.5 text-sm font-semibold text-blue-700 transition-colors hover:bg-blue-50 hover:text-blue-900">
             Raporto problem
           </Link>
@@ -47,7 +47,7 @@ export function Navbar() {
           </Link>
         </div>
 
-        <details className="relative md:hidden">
+        <details className="relative lg:hidden">
           <summary className="flex h-11 w-11 cursor-pointer list-none items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-slate-50 [&::-webkit-details-marker]:hidden">
             <Menu className="h-5 w-5" aria-hidden="true" />
             <span className="sr-only">Hap ose mbyll menynë</span>

@@ -16,6 +16,7 @@ import { WorkspaceHeader } from '@/components/layout/WorkspaceHeader';
 import { buttonVariantsClass } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { FlashMessage } from '@/components/ui/FlashMessage';
+import { SubmitButton } from '@/components/ui/SubmitButton';
 import { requireAdmin } from '@/lib/admin/server';
 
 export const dynamic = 'force-dynamic';
@@ -126,9 +127,7 @@ export default async function AdminStructurePage({
                   <Field label="Përshkrimi">
                     <input name="description" maxLength={500} className="field-input" />
                   </Field>
-                  <button type="submit" className={buttonVariantsClass()}>
-                    Krijo
-                  </button>
+                  <SubmitButton pendingLabel="Duke krijuar...">Krijo</SubmitButton>
                 </form>
               </Card>
             </details>
@@ -187,9 +186,7 @@ export default async function AdminStructurePage({
                         />
                         Aktiv
                       </label>
-                      <button type="submit" className={buttonVariantsClass({ variant: 'secondary' })}>
-                        Ruaj
-                      </button>
+                      <SubmitButton variant="secondary">Ruaj</SubmitButton>
                     </div>
                   </form>
                 </Card>
@@ -251,9 +248,7 @@ export default async function AdminStructurePage({
                       className="field-input"
                     />
                   </Field>
-                  <button type="submit" className={buttonVariantsClass()}>
-                    Krijo
-                  </button>
+                  <SubmitButton pendingLabel="Duke krijuar...">Krijo</SubmitButton>
                 </form>
               </Card>
             </details>
@@ -335,9 +330,7 @@ export default async function AdminStructurePage({
                         />
                         Aktiv
                       </label>
-                      <button type="submit" className={buttonVariantsClass({ variant: 'secondary' })}>
-                        Ruaj
-                      </button>
+                      <SubmitButton variant="secondary">Ruaj</SubmitButton>
                     </div>
                   </form>
                 </Card>

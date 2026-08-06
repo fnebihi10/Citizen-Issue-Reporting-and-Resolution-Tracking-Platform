@@ -127,6 +127,7 @@ Lexo [udhëzuesin e Supabase](docs/supabase-setup.md) dhe [checklistën e autent
 - [Verifikimi i Sprintit 6](docs/sprint-6-verification.md)
 - [Verifikimi i Sprintit 7](docs/sprint-7-verification.md)
 - [Verifikimi i Sprintit 8](docs/sprint-8-verification.md)
+- [Verifikimi i Sprintit 9](docs/sprint-9-verification.md)
 - [Plani i testimit](docs/test-plan.md)
 - [Diagramet autoritative](diagrams/README.md)
 - [Roadmap](docs/roadmap.md)

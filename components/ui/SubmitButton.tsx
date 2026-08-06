@@ -8,10 +8,12 @@ export function SubmitButton({
   children,
   pendingLabel = 'Duke ruajtur...',
   variant = 'primary',
+  className,
 }: {
   children: React.ReactNode;
   pendingLabel?: string;
   variant?: 'primary' | 'secondary' | 'danger';
+  className?: string;
 }) {
   const { pending } = useFormStatus();
 
@@ -22,6 +24,7 @@ export function SubmitButton({
       className={buttonVariantsClass({
         size: 'md',
         variant: variant === 'danger' ? 'destructive' : variant,
+        className,
       })}
     >
       {pending ? (
