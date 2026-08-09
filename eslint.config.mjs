@@ -10,6 +10,8 @@ export default defineConfig([
     'out/**',
     'build/**',
     'coverage/**',
+    'playwright-report/**',
+    'test-results/**',
     'generate_dataset.js',
     'next-env.d.ts',
   ]),

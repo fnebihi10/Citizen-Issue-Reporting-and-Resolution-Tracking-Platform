@@ -1,4 +1,5 @@
 import { loadEnvFile } from 'node:process';
+import { randomUUID } from 'node:crypto';
 import { createClient } from '@supabase/supabase-js';
 import WebSocket from 'ws';
 
@@ -40,7 +41,8 @@ function client() {
 const citizen = client();
 const official = client();
 const otherDepartmentOfficial = client();
-const auditTitle = 'Sprint 6 deterministic workflow audit';
+const auditTitlePrefix = 'Sprint 6 workflow audit';
+const auditRunId = randomUUID();
 
 async function signIn(target, email) {
   const { data, error } = await target.auth.signInWithPassword({
@@ -76,18 +78,28 @@ try {
     throw new Error('Sprint 6 audit category has no department.');
   }
 
-  let { data: report, error: reportError } = await citizen
+  let { data: reportRows, error: reportError } = await citizen
     .from('reports')
     .select('id, status, report_number')
-    .eq('title', auditTitle)
-    .maybeSingle();
+    .like('title', `${auditTitlePrefix}%`)
+    .in('status', [
+      'submitted',
+      'under_review',
+      'assigned',
+      'in_progress',
+      'resolved',
+      'reopened',
+    ])
+    .order('created_at', { ascending: false })
+    .limit(1);
   if (reportError) throw reportError;
+  let report = reportRows?.[0] ?? null;
 
   if (!report) {
     const { data: created, error: createError } = await citizen
       .from('reports')
       .insert({
-        title: auditTitle,
+        title: `${auditTitlePrefix} ${auditRunId}`,
         description:
           'Synthetic report used only to verify the Sprint 6 official workflow.',
         category_id: category.id,
@@ -104,10 +116,6 @@ try {
       .single();
     if (createError) throw createError;
     report = created;
-  }
-
-  if (report.status === 'rejected') {
-    throw new Error('The deterministic Sprint 6 audit report is rejected.');
   }
 
   if (report.status === 'resolved') {
@@ -178,8 +186,10 @@ try {
     report.status = 'resolved';
   }
 
-  const externalComment = `Citizen-visible Sprint 6 audit comment for ${report.id}.`;
-  const internalComment = `Internal Sprint 6 audit note for ${report.id}.`;
+  const externalComment =
+    `Citizen-visible Sprint 6 audit comment ${auditRunId} for ${report.id}.`;
+  const internalComment =
+    `Internal Sprint 6 audit note ${auditRunId} for ${report.id}.`;
 
   for (const [body, isInternal] of [
     [externalComment, false],

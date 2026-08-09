@@ -19,6 +19,11 @@ const privateNoStoreHeaders = [
   { key: 'Expires', value: '0' },
 ];
 
+const allowedDevOrigins = (process.env.NEXT_ALLOWED_DEV_ORIGINS ?? '')
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
 if (process.env.NODE_ENV === 'production') {
   securityHeaders.push({
     key: 'Strict-Transport-Security',
@@ -29,7 +34,7 @@ if (process.env.NODE_ENV === 'production') {
 const nextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
-  allowedDevOrigins: ['192.168.1.119'],
+  ...(allowedDevOrigins.length > 0 ? { allowedDevOrigins } : {}),
   async headers() {
     return [
       {

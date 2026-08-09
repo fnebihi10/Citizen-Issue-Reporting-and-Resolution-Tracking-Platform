@@ -2,7 +2,10 @@
 
 ## E implementuar në kod
 
-- Next.js `16.2.11` dhe dependency audit pa vulnerabilitete të raportuara.
+- Next.js `16.3.0`; audit-i i plotë dhe
+  `npm audit --omit=dev --audit-level=high` nuk raportojnë vulnerabilitete.
+  Tooling-u qëndron në linjën peer-compatible ESLint `9.39.5`, ndërsa lockfile
+  përdor `js-yaml` `4.3.1` me rregullimin e CVE-2026-59870.
 - Proxy i kufizuar te route-t e mbrojtura, me role nga `profiles`: `citizen`,
   `official`/`admin` dhe `admin`.
 - PKCE callback, session cookies dhe përgjigje auth me `no-store`.
@@ -60,7 +63,7 @@
 3. Aktivizo CAPTCHA për signup/reset kur aplikacioni bëhet publik.
 4. Aktivizo leaked-password protection nëse plani e mbështet.
 5. Vendos environment variables në Vercel; kurrë secret key në `NEXT_PUBLIC_*`.
-6. Kryej testet RLS/RBAC dhe raportin e 25+ testeve në Sprintin 9.
+6. Kryej testet RLS/RBAC dhe browser tests të autentikuara para release-it.
 
 ## Nuk bëjmë ende
 

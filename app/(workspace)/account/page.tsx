@@ -419,7 +419,7 @@ function AccountField({
       <dd
         className={[
           'mt-2 min-w-0 text-sm font-bold leading-5',
-          muted ? 'text-slate-400' : 'text-slate-900',
+          muted ? 'text-slate-600' : 'text-slate-900',
           breakAll ? 'break-all' : '',
         ].join(' ')}
       >

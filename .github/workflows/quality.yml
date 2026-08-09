@@ -46,6 +46,9 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=high
+
       - name: Browser quality, accessibility, and performance
         env:
           PLAYWRIGHT_PRODUCTION: 1
@@ -74,6 +77,40 @@ jobs:
 
       - name: Run pgTAP database and RLS tests
         run: npx supabase test db
+
+      - name: Lint application database schema
+        run: >-
+          npx supabase db lint --local --schema public
+          --level warning --fail-on error
+
+      - name: Export isolated Supabase configuration
+        run: |
+          eval "$(npx supabase status -o env)"
+          {
+            echo "NEXT_PUBLIC_SUPABASE_URL=$API_URL"
+            echo "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=$PUBLISHABLE_KEY"
+            echo "E2E_SUPABASE_URL=$API_URL"
+            echo "E2E_SUPABASE_PUBLISHABLE_KEY=$PUBLISHABLE_KEY"
+          } >> "$GITHUB_ENV"
+
+      - name: Build application against isolated Supabase
+        env:
+          NEXT_TELEMETRY_DISABLED: 1
+        run: npm run build
+
+      - name: Authenticated accessibility, responsive, and privacy tests
+        env:
+          PLAYWRIGHT_PRODUCTION: 1
+          E2E_SYNTHETIC_DATA: 1
+          E2E_SYNTHETIC_PASSWORD: SyntheticDemoOnly!2026
+          E2E_CITIZEN_EMAIL: synthetic.citizen@example.test
+          E2E_OFFICIAL_EMAIL: synthetic.official@example.test
+          E2E_ADMIN_EMAIL: synthetic.admin@example.test
+          E2E_ADMIN_PASSWORD: SyntheticDemoOnly!2026
+        run: >-
+          npx playwright test
+          e2e/authenticated-quality.pw.ts
+          e2e/admin-sla.pw.ts
 
       - name: Stop isolated Supabase stack
         if: always()

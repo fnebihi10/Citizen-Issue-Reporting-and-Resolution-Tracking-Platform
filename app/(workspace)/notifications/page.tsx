@@ -102,7 +102,7 @@ export default async function NotificationsPage() {
                             {notification.message}
                           </p>
                         </div>
-                        <time className="text-xs text-slate-500">
+                        <time className="text-xs text-slate-600">
                           {formatDate(notification.created_at)}
                         </time>
                       </div>

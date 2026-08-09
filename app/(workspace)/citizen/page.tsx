@@ -161,10 +161,10 @@ export default async function CitizenDashboardPage() {
           />
         </section>
 
-        <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1.4fr)_minmax(19rem,0.6fr)] lg:items-start">
-          <section aria-labelledby="recent-reports-title">
-            <div className="mb-4 flex items-end justify-between gap-4">
-              <div>
+        <div className="mt-6 grid min-w-0 gap-6 lg:grid-cols-[minmax(0,1.4fr)_minmax(19rem,0.6fr)] lg:items-start">
+          <section className="min-w-0" aria-labelledby="recent-reports-title">
+            <div className="mb-4 flex flex-col items-start gap-2 sm:flex-row sm:items-end sm:justify-between sm:gap-4">
+              <div className="min-w-0">
                 <p className="text-xs font-bold uppercase tracking-[0.14em] text-blue-600">
                   Pamje e shpejtë
                 </p>
@@ -241,10 +241,10 @@ export default async function CitizenDashboardPage() {
             )}
           </section>
 
-          <aside className="space-y-4" aria-label="Veprimet dhe përditësimet">
+          <aside className="min-w-0 space-y-4" aria-label="Veprimet dhe përditësimet">
             <Card className="overflow-hidden shadow-sm">
               <div className="border-b border-slate-100 p-5">
-                <p className="text-xs font-bold uppercase tracking-[0.14em] text-slate-400">
+                <p className="text-xs font-bold uppercase tracking-[0.14em] text-slate-600">
                   Hapi i radhës
                 </p>
                 {nearestActiveReport ? (
@@ -291,7 +291,7 @@ export default async function CitizenDashboardPage() {
             </Card>
 
             <Card className="p-5 shadow-sm">
-              <div className="flex items-center justify-between gap-3">
+              <div className="flex flex-wrap items-center justify-between gap-3">
                 <h2 className="font-black text-slate-950">Përditësime të reja</h2>
                 <Link href="/notifications" className="text-xs font-bold text-blue-700 hover:text-blue-900">
                   Hape inbox-in

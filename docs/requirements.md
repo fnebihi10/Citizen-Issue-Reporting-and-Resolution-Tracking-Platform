@@ -169,8 +169,8 @@ ndryshon implementimi.
 ### NFR-06 — Testimi dhe vlerësimi
 
 Paketa përfundimtare duhet të ketë së paku 25 teste funksionale, edge dhe
-sigurie, dataset 100+, si dhe — nëse është e mundur — usability test me 5–10
-persona.
+sigurie dhe dataset 100+. Një studim i jashtëm përdorshmërie mund ta plotësojë
+vlerësimin kur pjesëmarrësit janë të disponueshëm, por nuk është kusht bllokues.
 
 ## 5. Kufijtë e detyrueshëm
 

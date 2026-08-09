@@ -55,3 +55,20 @@ test('keyboard navigation exposes a visible focus indicator @usability', async (
       || outline.boxShadow !== 'none',
   ).toBe(true);
 });
+
+test('release metadata routes and custom 404 are available', async ({ page }) => {
+  const robotsResponse = await page.goto('/robots.txt');
+  expect(robotsResponse?.status()).toBe(200);
+  await expect(page.locator('body')).toContainText('Disallow: /admin/');
+  await expect(page.locator('body')).toContainText('Sitemap:');
+
+  const sitemapResponse = await page.goto('/sitemap.xml');
+  expect(sitemapResponse?.status()).toBe(200);
+  await expect(page.locator('body')).toContainText('/map');
+
+  const missingResponse = await page.goto('/release-route-that-does-not-exist');
+  expect(missingResponse?.status()).toBe(404);
+  await expect(page.getByRole('heading', { level: 1 })).toContainText(
+    'Faqja nuk u gjet',
+  );
+});

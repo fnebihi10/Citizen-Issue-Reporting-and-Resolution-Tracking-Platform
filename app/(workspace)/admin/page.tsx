@@ -218,7 +218,7 @@ export default async function AdminDashboardPage() {
             <Card className="h-full p-5 shadow-sm sm:p-6">
               <div className="flex items-center justify-between gap-3">
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-[0.13em] text-slate-400">
+                  <p className="text-xs font-bold uppercase tracking-[0.13em] text-slate-600">
                     Gjurmueshmëria
                   </p>
                   <h2 id="recent-audit-title" className="mt-1.5 font-black text-slate-950">

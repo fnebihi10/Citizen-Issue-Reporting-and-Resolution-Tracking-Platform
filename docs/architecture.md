@@ -8,7 +8,7 @@ Platforma përdor një aplikacion të vetëm Next.js App Router me TypeScript. S
 Browser / Mobile Web
         |
         v
-Next.js 16 (Vercel planifikohet në Sprintin 10)
+Next.js 16 (release candidate i përgatitur për Vercel në Sprintin 10)
   public UI | auth UI | protected workspace
         |
         +------ Supabase ------+
@@ -66,7 +66,7 @@ Next.js 16 (Vercel planifikohet në Sprintin 10)
 - Harta publike dhe zgjedhja e lokacionit përdorin OpenStreetMap + React Leaflet; geocoding dhe cache nuk janë pjesë e Sprintit 5.
 - Të dhënat e demo-s janë 120 raporte deterministike sintetike; JSON-i dhe SQL
   seed-i gjenerohen bashkë dhe nuk mbajnë adresa ose foto reale.
-- Projekti përdor Next.js `16.2.11`; Turbopack është default për `next dev`
+- Projekti përdor Next.js `16.3.0`; Turbopack është default për `next dev`
   dhe `next build`.
 
 ## Definition of Done

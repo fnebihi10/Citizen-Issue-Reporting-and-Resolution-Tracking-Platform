@@ -6,7 +6,9 @@ Titulli i punimit: **Zhvillimi i një platforme për raportimin, ndjekjen dhe zg
 
 ## Gjendja aktuale
 
-Sprintet 1–8 janë të implementuara në nivel aplikacioni dhe databaze:
+Sprintet 1–9 janë të implementuara dhe të verifikuara në nivel aplikacioni,
+databaze dhe cilësie. Sprinti 10 për paketën e release-it dhe tezës është në
+punë:
 
 - arkitekturë, standarde të kodit dhe design system responsive;
 - Supabase me PostgreSQL/PostGIS, migrations, RLS, private Storage dhe views publike të sanitizuara;
@@ -33,10 +35,12 @@ Sprintet 1–8 janë të implementuara në nivel aplikacioni dhe databaze:
   përgjithësuara publike;
 - dataset dhe seed databaze të sinkronizuar me 120 raporte sintetike, prej të
   cilave 104 publike me lokacion server-side të përgjithësuar;
-- Next.js 16.2.11, React 19, Turbopack default, TypeScript strict dhe ESLint flat config;
-- audit i dependency-ve pa vulnerabilitete të njohura në kohën e verifikimit.
-- GitHub Actions quality gate për `typecheck`, lint, teste, dataset, build dhe
-  pgTAP në një Supabase të izoluar.
+- Next.js 16.3.0, React 19, Turbopack default, TypeScript strict dhe ESLint flat config;
+- audit i plotë dhe audit i dependency-ve të production pa vulnerabilitete të
+  njohura;
+- GitHub Actions quality gate për `typecheck`, lint, teste, dataset, build,
+  audit të production, pgTAP, lint të skemës dhe browser tests të autentikuara
+  në një Supabase të izoluar.
 
 Migrations dhe RLS janë burimi autoritativ për databazën. Gjendja e projektit Supabase remote duhet të verifikohet me `supabase migration list` dhe `supabase db push --dry-run` para përdorimit me të dhëna reale.
 
@@ -68,7 +72,10 @@ npm run lint
 npm test
 npm run check:dataset
 npm run build
-npm audit --omit=dev
+npm audit --omit=dev --audit-level=high
+npm run test:e2e
+npx supabase test db
+npx supabase db lint --local --schema public --level warning --fail-on error
 ```
 
 Kontrolli remote lejohet vetëm kundër projektit dev/staging të seed-uar:
@@ -128,6 +135,9 @@ Lexo [udhëzuesin e Supabase](docs/supabase-setup.md) dhe [checklistën e autent
 - [Verifikimi i Sprintit 7](docs/sprint-7-verification.md)
 - [Verifikimi i Sprintit 8](docs/sprint-8-verification.md)
 - [Verifikimi i Sprintit 9](docs/sprint-9-verification.md)
+- [Deploy në Vercel](docs/deployment.md)
+- [Plani i demo-s](docs/demo-plan.md)
+- [Verifikimi i Sprintit 10](docs/sprint-10-verification.md)
 - [Plani i testimit](docs/test-plan.md)
 - [Diagramet autoritative](diagrams/README.md)
 - [Roadmap](docs/roadmap.md)

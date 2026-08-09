@@ -6,7 +6,7 @@ import type { PublicReport } from '@/types/database';
 const PublicIssueMap = dynamic(() => import('./PublicIssueMap'), {
   ssr: false,
   loading: () => (
-    <div className="flex h-[440px] items-center justify-center rounded-2xl border border-slate-200 bg-slate-100 text-sm font-semibold text-slate-500 sm:h-[600px]">
+    <div className="flex h-[440px] items-center justify-center rounded-2xl border border-slate-200 bg-slate-100 text-sm font-semibold text-slate-600 sm:h-[600px]">
       Duke përgatitur hartën publike...
     </div>
   ),
@@ -15,7 +15,7 @@ const PublicIssueMap = dynamic(() => import('./PublicIssueMap'), {
 const CompactPublicIssueMap = dynamic(() => import('./PublicIssueMap'), {
   ssr: false,
   loading: () => (
-    <div className="flex h-[320px] items-center justify-center rounded-2xl border border-slate-200 bg-slate-100 text-sm font-semibold text-slate-500 sm:h-[380px]">
+    <div className="flex h-[320px] items-center justify-center rounded-2xl border border-slate-200 bg-slate-100 text-sm font-semibold text-slate-600 sm:h-[380px]">
       Duke përgatitur hartën publike...
     </div>
   ),

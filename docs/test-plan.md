@@ -12,7 +12,7 @@ nuk duhet të fusë emra, adresa, fotografi ose lokacione reale.
 | Databazë | RLS/RBAC, triggers, workflow, privatësi dhe integritet | pgTAP + Supabase lokal/CI |
 | Integrim | Auth, Storage, RPC dhe deny paths kundër projektit dev | Skriptet `verify:*` |
 | UI responsive | Flukset dhe overflow në viewport-et e synuara | Kontroll manual/browser |
-| Përdorshmëri | Kuptueshmëria dhe përfundimi i detyrave | 5–10 persona, Sprint 9 |
+| Përdorshmëri | Kuptueshmëria dhe përfundimi i detyrave | Kontroll manual i pronarit + Playwright |
 
 ## Rastet minimale që duhet të ruhen
 
@@ -55,9 +55,13 @@ npm run lint
 npm test
 npm run check:dataset
 npm run build
+npm audit --omit=dev --audit-level=high
+npm run test:e2e
 npx supabase test db
+npx supabase db lint --local --schema public --level warning --fail-on error
 ```
 
 Testet remote ekzekutohen vetëm kundër projektit `dev/staging` të seed-uar dhe
-vetëm me flamurin eksplicit `--allow-dev`. Testi i përdorshmërisë, matjet e
-performancës dhe tabela finale e rezultateve plotësohen në Sprintin 9.
+vetëm me flamurin eksplicit `--allow-dev`. Browser suite e autentikuar përdor
+Supabase lokal të izoluar në CI; pronari ka kontrolluar manualisht flukset me
+llogari sintetike qytetari, zyrtari dhe administratori.

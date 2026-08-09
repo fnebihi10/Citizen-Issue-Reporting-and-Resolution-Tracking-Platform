@@ -375,7 +375,7 @@ function Field({
       <span className="mb-1.5 flex items-center justify-between gap-2 text-[11px] font-bold uppercase tracking-[0.1em] text-slate-500">
         {label}
         {helper ? (
-          <span className="truncate normal-case tracking-normal text-slate-400">
+          <span className="truncate normal-case tracking-normal text-slate-600">
             {helper}
           </span>
         ) : null}

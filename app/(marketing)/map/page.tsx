@@ -304,7 +304,7 @@ export default async function PublicMapPage({
                     Raportimet publike
                   </h2>
                   <span
-                    className="text-xs font-bold text-slate-400"
+                    className="text-xs font-bold text-slate-600"
                     aria-live="polite"
                   >
                     {visibleReports.length} gjithsej

@@ -150,7 +150,7 @@ export default async function CitizenReportDetailPage({
               </div>
               <dl className="grid gap-px bg-slate-100 sm:grid-cols-2">
                 <div className="bg-white p-5">
-                  <dt className="text-xs font-bold uppercase tracking-[0.1em] text-slate-400">
+                  <dt className="text-xs font-bold uppercase tracking-[0.1em] text-slate-600">
                     Kategoria
                   </dt>
                   <dd className="mt-2 text-sm font-bold text-slate-800">
@@ -158,7 +158,7 @@ export default async function CitizenReportDetailPage({
                   </dd>
                 </div>
                 <div className="bg-white p-5">
-                  <dt className="text-xs font-bold uppercase tracking-[0.1em] text-slate-400">
+                  <dt className="text-xs font-bold uppercase tracking-[0.1em] text-slate-600">
                     Departamenti
                   </dt>
                   <dd className="mt-2 text-sm font-bold text-slate-800">
@@ -166,7 +166,7 @@ export default async function CitizenReportDetailPage({
                   </dd>
                 </div>
                 <div className="bg-white p-5">
-                  <dt className="text-xs font-bold uppercase tracking-[0.1em] text-slate-400">
+                  <dt className="text-xs font-bold uppercase tracking-[0.1em] text-slate-600">
                     Lokacioni yt privat
                   </dt>
                   <dd className="mt-2 flex items-start gap-2 text-sm font-bold text-slate-800">
@@ -175,7 +175,7 @@ export default async function CitizenReportDetailPage({
                   </dd>
                 </div>
                 <div className="bg-white p-5">
-                  <dt className="text-xs font-bold uppercase tracking-[0.1em] text-slate-400">
+                  <dt className="text-xs font-bold uppercase tracking-[0.1em] text-slate-600">
                     Afati fillestar
                   </dt>
                   <dd className="mt-2 flex items-center gap-2 text-sm font-bold text-slate-800">

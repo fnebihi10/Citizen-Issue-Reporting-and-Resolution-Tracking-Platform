@@ -288,7 +288,7 @@ export default async function PublicReportDetailPage({
 function PublicFact({ label, value }: { label: string; value: string }) {
   return (
     <div className="p-5">
-      <dt className="text-xs font-bold uppercase tracking-[0.12em] text-slate-400">
+      <dt className="text-xs font-bold uppercase tracking-[0.12em] text-slate-600">
         {label}
       </dt>
       <dd className="mt-2 text-sm font-black text-slate-900">{value}</dd>

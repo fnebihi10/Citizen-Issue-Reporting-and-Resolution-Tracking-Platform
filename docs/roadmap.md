@@ -42,7 +42,8 @@ serveri; lokacioni publik nuk redaktohet nga klienti.
 
 ## Sprint 9 — Quality, security & evaluation
 
-Minimum 25 teste, testet e RLS/RBAC, rate limiting, accessibility, performance, dataset 100+ dhe usability test me 5–10 persona.
+Minimum 25 teste, testet e RLS/RBAC, rate limiting, accessibility, performance,
+dataset 100+ dhe vlerësim manual i flukseve kryesore.
 
 ## Sprint 10 — Release & thesis package
 

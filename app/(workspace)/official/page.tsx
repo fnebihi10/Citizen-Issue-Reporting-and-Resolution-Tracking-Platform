@@ -206,9 +206,9 @@ export default async function OfficialDashboardPage() {
           />
         </section>
 
-        <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1.4fr)_minmax(19rem,0.6fr)] lg:items-start">
-          <section aria-labelledby="attention-title">
-            <div className="mb-4 flex items-end justify-between gap-4">
+        <div className="mt-6 grid min-w-0 gap-6 lg:grid-cols-[minmax(0,1.4fr)_minmax(19rem,0.6fr)] lg:items-start">
+          <section className="min-w-0" aria-labelledby="attention-title">
+            <div className="mb-4 flex flex-col items-start gap-2 sm:flex-row sm:items-end sm:justify-between sm:gap-4">
               <div>
                 <p className="text-xs font-bold uppercase tracking-[0.14em] text-blue-600">
                   Radha operative
@@ -285,11 +285,11 @@ export default async function OfficialDashboardPage() {
             )}
           </section>
 
-          <aside className="space-y-4" aria-label="Puna dhe përditësimet e zyrtarit">
+          <aside className="min-w-0 space-y-4" aria-label="Puna dhe përditësimet e zyrtarit">
             <Card className="p-5 shadow-sm">
               <div className="flex items-center justify-between gap-3">
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-[0.13em] text-slate-400">
+                  <p className="text-xs font-bold uppercase tracking-[0.13em] text-slate-600">
                     Përgjegjësia ime
                   </p>
                   <h2 className="mt-1.5 font-black text-slate-950">Afatet më të afërta</h2>

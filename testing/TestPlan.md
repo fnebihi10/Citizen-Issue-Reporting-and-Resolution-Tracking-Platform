@@ -43,21 +43,24 @@ Ky plan testimi përshkruan qasjen për të vlerësuar funksionalitetin dhe sigu
 26. **Skadimi i Session-it**: Session-i i workspace-it refuzohet një orë pas
     hyrjes, kërkon ri-autentikim dhe ruan vetëm një destinacion të brendshëm.
 
-## Vlerësimi Me Përdorues (Usability Testing)
-- Rekrutimi i 5–10 personave vullnetarë.
-- Kryerja e skenarit "Raporto një gropë në rrugën kryesore nga telefoni".
-- Matja e kohës së përfundimit, gabimeve dhe përshtypjes së përgjithshme.
+## Vlerësimi manual i përdorshmërisë
+
+- Pronari kontrollon flukset publike dhe të tri roleve me llogari sintetike.
+- Playwright mat overflow-in, accessibility, navigimin me tastierë dhe flukset
+  kryesore në viewport-e mobile dhe desktop.
+- Një studim i jashtëm mund të shtohet më vonë, por nuk deklarohet si i kryer.
 
 ## Mjedisi dhe Mjetet e Testimit
 - **Dataset**: `dataset/synthetic_dataset.json` me 120 raporte deterministike.
 - **Mjetet**: Vitest për funksionet e pastra, pgTAP në Supabase lokal/GitHub
   Actions për databazën, smoke scripts për dev/staging dhe testim manual
-  vizual. Playwright mbetet për paketën end-to-end të Sprintit 9. Nuk
-  deklarojmë asnjë test si të kaluar para ekzekutimit të tij.
+  vizual. Playwright mbulon paketën end-to-end publike dhe të autentikuar të
+  Sprintit 9. Nuk deklarojmë asnjë test si të kaluar para ekzekutimit të tij.
 
-## Automatizimi aktual pas Sprintit 7
+## Automatizimi aktual i Sprintit 9
 
-- `npm test` ekzekuton 66 teste Vitest për password/redirect/RBAC, skadimin
+- `npm test` ekzekuton 80 teste Vitest për URL-në e release-it,
+  password/redirect/RBAC, skadimin
   absolut të session-it, përmbledhjet e paneleve, validimin e
   raportit, workflow-n, normalizimin e view-t publik dhe heqjen fail-closed të
   EXIF/GPS, si dhe validimin e administrimit, klasifikimin e SLA-së dhe
@@ -73,10 +76,12 @@ Ky plan testimi përshkruan qasjen për të vlerësuar funksionalitetin dhe sigu
 - `supabase/tests/database/sprint6_workflow.test.sql` shton 18 assertions për
   privilegjet, state machine-in, historinë, komentet interne, njoftimet dhe
   rihapjen.
-- `supabase/tests/database/sprint7_admin_governance.test.sql` shton 22
-  assertions për privilegjet e eksportit, audit trigger-at, mbrojtjen e
-  administratorit/departamenteve, RLS-në dhe eventet e eksportit. GitHub
-  Actions i ekzekuton të tri suit-at në Supabase të izoluar.
+- Pesë skedarë pgTAP ekzekutojnë 83 assertions për hardening-un, request
+  context, workflow-n, governance-in administrativ dhe transparencën publike.
+  GitHub Actions i ekzekuton në Supabase të izoluar.
+- Playwright kontrollon flukset publike, performance, pesë viewport-e,
+  dashboard-in SLA dhe route-t për qytetar/zyrtar/admin me axe WCAG A/AA,
+  overflow horizontal dhe header-at private `no-store`.
 - `npm run verify:remote -- --allow-dev` verifikon krijimin e raportit qytetar,
   kufijtë e RPC-së, ndalimin e update-it direkt dhe upload/download-in privat
   e immutable të një prove sintetike në projektin e hostuar.
@@ -84,5 +89,5 @@ Ky plan testimi përshkruan qasjen për të vlerësuar funksionalitetin dhe sigu
   faqet e autentikuara dhe ndalimin e route-ve `official`/`admin` për qytetarin.
 - `npm run verify:sprint6 -- --allow-dev` ekzekuton ciklin e plotë sintetik
   official/citizen kundër projektit të hostuar `dev`.
-- Këto kontrolle nuk zëvendësojnë paketën përfundimtare me 25+ skenarë
-  funksionalë, të skajeve dhe të sigurisë të Sprintit 9.
+- Këto kontrolle kalojnë minimumin prej 25 skenarësh dhe plotësohen nga
+  kontrolli manual i pronarit me të tri rolet.

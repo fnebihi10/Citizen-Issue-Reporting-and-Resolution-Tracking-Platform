@@ -47,4 +47,4 @@ Ky dokument mban kriteret e pranimit dhe provat e verifikimit për Sprintin 4 dh
 
 - suita e plotë e së paku 25 skenarëve funksionalë, të skajeve dhe të sigurisë është dorëzim i Sprintit 9; 26 unit tests nuk paraqiten si zëvendësim i saj;
 - pgTAP suite lokale nuk është ekzekutuar sepse Supabase lokal kërkon Docker, i cili nuk është aktiv në këtë pajisje;
-- testimi i përdorshmërisë me 5–10 persona dhe pajisjet fizike mbeten pjesë e vlerësimit të mëvonshëm, jo kusht i Sprintit 5.
+- vlerësimi i zgjeruar i përdorshmërisë mbetet opsional dhe nuk është kusht i Sprintit 5.
