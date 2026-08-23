@@ -1,8 +1,10 @@
-# Plani i testimit dhe vlerësimit
+# Raporti final i testimit dhe vlerësimit
 
-Ky plan mbulon kërkesën e mentorit për së paku 25 teste funksionale, edge dhe
-sigurie. Testet automatike përdorin vetëm datasetin sintetik; testimi manual
-nuk duhet të fusë emra, adresa, fotografi ose lokacione reale.
+Ky raport bashkon planin, rastet dhe evidencën e release-it në një burim të
+vetëm autoritativ. Ai mbulon kërkesën e mentorit për së paku 25 teste
+funksionale, të skajeve dhe të sigurisë. Testet automatike përdorin vetëm
+datasetin sintetik; testimi manual nuk duhet të fusë emra, adresa, fotografi
+ose lokacione reale.
 
 ## Nivelet e testimit
 
@@ -46,6 +48,9 @@ nuk duhet të fusë emra, adresa, fotografi ose lokacione reale.
 28. Dendësia agregohet vetëm nga lokacionet e përgjithësuara.
 29. Dataset-i ka të paktën 100 raporte sintetike.
 30. Faqet kryesore nuk kanë horizontal overflow në viewport-et e synuara.
+31. Zyrtari mund të ngarkojë provë fotografie të zgjidhjes vetëm në raport të
+    autorizuar; skedari pastrohet nga EXIF/GPS, regjistrohet si `resolution`
+    dhe nuk shfaqet në kontratën publike.
 
 ## Komandat e quality gate
 
@@ -65,3 +70,21 @@ Testet remote ekzekutohen vetëm kundër projektit `dev/staging` të seed-uar dh
 vetëm me flamurin eksplicit `--allow-dev`. Browser suite e autentikuar përdor
 Supabase lokal të izoluar në CI; pronari ka kontrolluar manualisht flukset me
 llogari sintetike qytetari, zyrtari dhe administratori.
+
+## Evidenca e fundit lokale — 23.08.2026
+
+| Kontrolli | Rezultati |
+|---|---|
+| TypeScript | PASS |
+| ESLint | PASS |
+| Vitest | PASS — 16 skedarë, 80/80 teste |
+| Dataset | PASS — 120 raporte JSON/SQL të sinkronizuara |
+| Build production | PASS — Next.js 16.3.0 |
+| Audit production dependencies | PASS — 0 vulnerabilitete |
+| pgTAP | PASS — 5 skedarë, 83/83 assertions |
+| Supabase DB lint | PASS — pa gjetje në schema `public` |
+
+Playwright-i i autentikuar dhe smoke test-i live regjistrohen në
+[`sprint-10-verification.md`](sprint-10-verification.md) pas ekzekutimit të CI-së
+mbi commit-in e release-it. Studim i jashtëm me 5–10 persona nuk është
+realizuar dhe nuk paraqitet si rezultat.

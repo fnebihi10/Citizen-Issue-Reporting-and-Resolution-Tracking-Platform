@@ -8,7 +8,7 @@ Platforma përdor një aplikacion të vetëm Next.js App Router me TypeScript. S
 Browser / Mobile Web
         |
         v
-Next.js 16 (release candidate i përgatitur për Vercel në Sprintin 10)
+Next.js 16 (release-i final teknik i vendosur në Vercel)
   public UI | auth UI | protected workspace
         |
         +------ Supabase ------+

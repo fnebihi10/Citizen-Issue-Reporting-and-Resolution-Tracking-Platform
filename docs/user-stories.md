@@ -92,6 +92,8 @@ Kriteret e pranimit:
 - tranzicione vetëm sipas state machine;
 - histori dhe komente immutable;
 - zgjidhja/refuzimi kërkojnë shënim;
+- zyrtari mund të ngarkojë provë sintetike të zgjidhjes, të pastruar nga
+  EXIF/GPS dhe të ruajtur privatisht si `resolution`;
 - qytetari merr njoftim dhe hap faqen e detajit të raportit.
 
 Përfundimi UX para Sprintit 7:

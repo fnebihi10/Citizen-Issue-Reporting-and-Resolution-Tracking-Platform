@@ -29,6 +29,9 @@
   koordinatë publike të kontrolluar nga klienti.
 - Fotografitë dekodohen dhe ri-enkodohen në browser para upload-it; nëse
   metadata EXIF/GPS nuk mund të hiqet, upload-i bllokohet.
+- Zyrtari mund të regjistrojë provë fotografike të zgjidhjes vetëm brenda
+  fushës së autorizuar. Prova pastrohet nga EXIF/GPS, ruhet në bucket privat
+  si `resolution` dhe nuk ekspozohet në views ose faqet publike.
 - Krijimi i raportit kufizohet në 5 raporte për qytetar brenda 5 minutave në
   nivel databaze.
 - RPC-ja e raporteve të ngjashme ekspozon vetëm lokacione publike të
@@ -65,9 +68,12 @@
 5. Vendos environment variables në Vercel; kurrë secret key në `NEXT_PUBLIC_*`.
 6. Kryej testet RLS/RBAC dhe browser tests të autentikuara para release-it.
 
-## Nuk bëjmë ende
+## Vendime dhe kufizime të release-it
 
 - Nuk shtojmë `service_role`/secret key; operacionet administrative përdorin
   session-in e adminit, RLS dhe RPC/trigger-a të guard-uar.
-- Nuk vendosim Content Security Policy me `unsafe-inline`; CSP me nonce do të shtohet në Sprintin 10 pasi të përfshihen harta dhe provider-at e jashtëm.
+- Release-i nuk deklaron Content Security Policy me nonce. Header-at e tjerë
+  të sigurisë, RLS dhe kontratat publike janë aktivë; CSP me nonce mbetet
+  përmirësim defense-in-depth për një vendosje operative komunale dhe nuk
+  zëvendësohet me një policy më të dobët që kërkon `unsafe-inline`.
 - Nuk bëjmë ndryshime direkte në Supabase Cloud pa migration të commit-uar.

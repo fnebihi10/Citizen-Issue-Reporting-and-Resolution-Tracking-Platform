@@ -33,6 +33,7 @@ Thumbs.db
 coverage/
 playwright-report/
 test-results/
+.audit/
 
 # Local Supabase state
 .temp/

@@ -91,7 +91,9 @@ Statuset janë:
 - `reopened` — rihapur.
 
 Kalimet e palejuara duhet të bllokohen nga databaza. Zgjidhja kërkon shënime
-zgjidhjeje; refuzimi kërkon arsye.
+zgjidhjeje; refuzimi kërkon arsye. Gjatë ose pas trajtimit, zyrtari i
+autorizuar mund të ngarkojë fotografi sintetike të zgjidhjes. Ato ruhen në
+Storage privat, pastrohen nga EXIF/GPS dhe nuk publikohen në faqen publike.
 
 ### FR-06 — Komentet, historia dhe njoftimet
 
@@ -129,8 +131,9 @@ limiting dhe audit log për ndryshimet e ndjeshme.
 
 ### FR-12 — Rastet emergjente
 
-Platforma nuk pranon trajtim emergjencash. UI-ja duhet ta shpjegojë qartë këtë
-kufi dhe ta drejtojë përdoruesin te kanalet zyrtare të emergjencës.
+Platforma nuk pranon trajtim emergjencash. UI-ja e shpjegon qartë këtë kufi
+dhe, për rrezik të menjëhershëm, e drejton përdoruesin te numri unik emergjent
+pa pagesë **112** në Republikën e Kosovës.
 
 ## 4. Kërkesat jofunksionale
 

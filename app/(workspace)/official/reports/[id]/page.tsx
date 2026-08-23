@@ -11,6 +11,7 @@ import { addOfficialComment } from '@/app/(workspace)/workflow/actions';
 import { WorkspaceHeader } from '@/components/layout/WorkspaceHeader';
 import { OfficialWorkflowPanel } from '@/components/reports/OfficialWorkflowPanel';
 import { ReportConversation } from '@/components/reports/ReportConversation';
+import { ResolutionEvidenceUpload } from '@/components/reports/ResolutionEvidenceUpload';
 import { ReportStatusBadge } from '@/components/reports/ReportStatusBadge';
 import { ReportTimeline } from '@/components/reports/ReportTimeline';
 import { Card } from '@/components/ui/card';
@@ -143,7 +144,7 @@ export default async function OfficialReportDetailPage({
         </div>
 
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1.25fr)_minmax(320px,0.75fr)] lg:items-start">
-          <div className="space-y-6">
+          <div className="min-w-0 space-y-6">
             <Card className="overflow-hidden shadow-sm">
               <div className="border-b border-slate-100 bg-slate-950 p-6 text-white sm:p-7">
                 <div className="flex flex-wrap items-center gap-2">
@@ -152,10 +153,10 @@ export default async function OfficialReportDetailPage({
                   </span>
                   <ReportStatusBadge status={report.status} />
                 </div>
-                <h1 className="mt-4 text-2xl font-black tracking-tight sm:text-3xl">
+                <h1 className="mt-4 break-words text-2xl font-black tracking-tight sm:text-3xl">
                   {report.title}
                 </h1>
-                <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-slate-300">
+                <p className="mt-3 whitespace-pre-wrap break-words text-sm leading-7 text-slate-300">
                   {report.description}
                 </p>
               </div>
@@ -164,7 +165,7 @@ export default async function OfficialReportDetailPage({
                   <dt className="text-xs font-bold uppercase tracking-[0.1em] text-slate-600">
                     Kategoria
                   </dt>
-                  <dd className="mt-2 text-sm font-bold text-slate-800">
+                  <dd className="mt-2 break-words text-sm font-bold text-slate-800">
                     {category?.name ?? 'E panjohur'}
                   </dd>
                 </div>
@@ -180,9 +181,11 @@ export default async function OfficialReportDetailPage({
                   <dt className="text-xs font-bold uppercase tracking-[0.1em] text-slate-600">
                     Lokacioni privat
                   </dt>
-                  <dd className="mt-2 flex items-start gap-2 text-sm font-bold text-slate-800">
+                  <dd className="mt-2 flex min-w-0 items-start gap-2 text-sm font-bold text-slate-800">
                     <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-blue-600" aria-hidden="true" />
-                    {report.address_text || 'Pika e saktë ruhet në databazë'}
+                    <span className="min-w-0 break-words">
+                      {report.address_text || 'Pika e saktë ruhet në databazë'}
+                    </span>
                   </dd>
                 </div>
                 <div className="bg-white p-5">
@@ -200,11 +203,13 @@ export default async function OfficialReportDetailPage({
                   Krijuar më {formatDate(report.created_at)} · Përditësuar më{' '}
                   {formatDate(report.updated_at)}
                 </p>
-                <p className="mt-2 flex items-center gap-2 font-semibold">
-                  <ShieldCheck className="h-4 w-4 text-emerald-600" aria-hidden="true" />
-                  {report.is_public
-                    ? 'Publikuar vetëm me përmbajtje dhe lokacion të sanitizuar.'
-                    : 'Raportimi mbetet privat.'}
+                <p className="mt-2 flex min-w-0 items-start gap-2 font-semibold">
+                  <ShieldCheck className="mt-1 h-4 w-4 shrink-0 text-emerald-600" aria-hidden="true" />
+                  <span className="min-w-0 break-words">
+                    {report.is_public
+                      ? 'Publikuar vetëm me përmbajtje dhe lokacion të sanitizuar.'
+                      : 'Raportimi mbetet privat.'}
+                  </span>
                 </p>
               </div>
             </Card>
@@ -258,10 +263,13 @@ export default async function OfficialReportDetailPage({
                   ))
                 )}
               </div>
+              {report.status === 'in_progress' || report.status === 'resolved' ? (
+                <ResolutionEvidenceUpload reportId={report.id} />
+              ) : null}
             </Card>
           </div>
 
-          <div className="space-y-6">
+          <div className="min-w-0 space-y-6">
             <Card className="p-5 shadow-sm sm:p-6">
               <h2 className="text-lg font-black text-slate-950">Veprimi i radhës</h2>
               <p className="mt-2 text-sm leading-6 text-slate-600">

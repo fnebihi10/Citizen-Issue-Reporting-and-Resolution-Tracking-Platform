@@ -3,26 +3,36 @@
 Demo-ja përdor vetëm llogari dhe raporte sintetike. Kredencialet mbahen jashtë
 Git-it dhe ndahen vetëm me personat e autorizuar për prezantim.
 
-## Rrjedha 10–12 minuta
+## Skenari i videos 4–6 minuta
 
-1. **Vizitori publik** — shpjego kufirin jo-emergjent, statistikat, filtrat,
-   hartën/dendësinë dhe privatësinë e lokacionit.
-2. **Qytetari** — hyr, krijo një raport sintetik pa fotografi personale, trego
-   sugjerimet, statusin, historinë dhe njoftimet.
-3. **Zyrtari** — verifiko raportin, cakto departament/zyrtar, publiko, shto një
-   koment publik dhe një shënim intern, pastaj dokumento zgjidhjen.
-4. **Qytetari** — trego njoftimin dhe rihapjen e kontrolluar të raportit.
-5. **Administratori** — trego SLA, analitikën privacy-safe, audit log-un,
-   strukturën/rolet dhe një eksport pa të dhëna personale.
+1. **0:00–0:35 — Hyrja dhe vizitori publik.** Thuaj që platforma trajton vetëm
+   çështje jo-emergjente dhe se për emergjenca telefonohet 112. Trego hartën,
+   filtrat dhe faktin që lokacionet janë të përgjithësuara.
+2. **0:35–1:45 — Qytetari.** Hyr me llogarinë demo, krijo raport sintetik me
+   titull, kategori, lokacion dhe fotografi sintetike. Trego sugjerimin sipas
+   kategorisë, distancës dhe kohës, pastaj raportimet e mia.
+3. **1:45–3:25 — Zyrtari.** Hyr në profilin e zyrtarit, verifiko raportin,
+   cakto departamentin/zyrtarin dhe vazhdo workflow-in. Trego komentin publik,
+   shënimin intern, historinë, njoftimet dhe ngarko një fotografi sintetike të
+   zgjidhjes para statusit `resolved`.
+4. **3:25–4:05 — Qytetari dhe transparenca.** Trego njoftimin, shënimet/provën
+   e dukshme për qytetarin dhe rihapjen e kontrolluar. Hape faqen publike dhe
+   thekso se identiteti, pika private dhe fotografitë nuk publikohen.
+5. **4:05–5:20 — Administratori.** Trego monitorimin SLA, statistikat,
+   heatmap-in, audit log-un dhe eksportin CSV/JSON pa fusha personale.
+6. **5:20–5:40 — Përfundimi.** Përmend dataset-in me 120 raporte sintetike,
+   testet automatike dhe URL-në live.
 
 ## Para prezantimit
 
-- përdor deployment-in dhe commit-in e shënuar si release candidate;
+- përdor deployment-in production dhe commit-in e shënuar në raportin e
+  verifikimit;
 - kontrollo të tri llogaritë demo dhe ruaj kredencialet në një password manager;
 - sigurohu që raporti i demo-s është sintetik dhe nuk prek rate limit-in;
 - përgatit një browser profile për secilin rol;
 - mbaj screenshot-et dhe diagramet si fallback nëse rrjeti dështon;
 - mos përdor email, adresë, fotografi ose lokacion të një personi real.
+- regjistro në 1080p dhe sigurohu që videoja e eksportuar zgjat 4–6 minuta.
 
 ## Pas prezantimit
 

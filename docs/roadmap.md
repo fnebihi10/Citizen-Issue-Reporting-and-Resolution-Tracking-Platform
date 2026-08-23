@@ -26,28 +26,31 @@ Krijimi i raportit, kategoritë, validimi, fotografia, lokacioni, raportimet e m
 
 Inbox-i i zyrtarit, verifikimi, caktimi i departamentit, tranzicionet e statusit, komentet, historia dhe rihapja.
 
-## Sprint 7 — Administration & SLA (implementuar)
+## Sprint 7 — Administration & SLA (i përfunduar)
 
 Paneli administrativ, përdoruesit/rolet, departamentet, kategoritë, SLA,
 vonesat, audit log dhe eksportet CSV/JSON privacy-safe. Çdo ndryshim i
 ndjeshëm auditohet nga databaza dhe route-t `/admin/*` kërkojnë rolin
 autoritativ `admin`.
 
-## Sprint 8 — Public transparency & analytics (implementuar)
+## Sprint 8 — Public transparency & analytics (i përfunduar)
 
 Faqja publike e raportit, kërkimi dhe filtrat, statistikat, vizualizimi i
 pikave/dendësisë dhe paneli administrativ i analitikës. Të gjitha pamjet
 publike lexojnë vetëm views të sanitizuara dhe lokacionin e përgjithësuar nga
 serveri; lokacioni publik nuk redaktohet nga klienti.
 
-## Sprint 9 — Quality, security & evaluation
+## Sprint 9 — Quality, security & evaluation (i përfunduar)
 
 Minimum 25 teste, testet e RLS/RBAC, rate limiting, accessibility, performance,
 dataset 100+ dhe vlerësim manual i flukseve kryesore.
 
-## Sprint 10 — Release & thesis package
+## Sprint 10 — Release & thesis package (i përfunduar teknikisht)
 
-Deploy në Vercel, llogari demo, README, `.env.example`, diagramet, screenshot-et, raporti i testimit, video-demo dhe përditësimi i kapitujve.
+Deploy në Vercel, llogari demo, README, `.env.example`, diagramet SVG,
+screenshot-et dhe raporti final i testimit janë përfunduar. Video-demoja 4–6
+minuta dhe kredencialet demo paketohen veçmas për dorëzim privat te mentori;
+fjalëkalimet nuk ruhen në Git.
 
 ## Rregull për kalimin në sprintin tjetër
 

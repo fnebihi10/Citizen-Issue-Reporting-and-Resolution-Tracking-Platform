@@ -21,4 +21,5 @@
 - Çdo input ka label të dukshëm ose accessible name, fokus të qartë dhe mesazh gabimi.
 - Ngjyrat nuk janë sinjali i vetëm për statusin; përdorim edhe tekst/icon.
 - Mos publikojmë emër, email, telefon, fotografi identifikuese ose lokacion të saktë të qytetarit.
-- Raste emergjente shfaqen qartë dhe drejtohen te kanalet zyrtare, sepse platforma nuk është shërbim emergjence.
+- Rastet emergjente shfaqen qartë dhe drejtohen te numri unik emergjent pa
+  pagesë **112**, sepse platforma nuk është shërbim emergjence.

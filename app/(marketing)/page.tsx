@@ -195,7 +195,17 @@ export default function HomePage() {
         <div className="mx-auto max-w-7xl px-4 pb-12 sm:px-6 sm:pb-16 lg:px-8 lg:pb-20">
           <aside className="flex items-start gap-3 border-t border-slate-300 py-5 text-sm leading-6 text-slate-700" aria-label="Njoftim për raste emergjente">
             <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-700" aria-hidden="true" />
-            <p><strong className="text-slate-950">Rast emergjent?</strong> Kjo platformë nuk përdoret për emergjenca. Përdor kanalet zyrtare të emergjencës.</p>
+            <p>
+              <strong className="text-slate-950">Rast emergjent?</strong> Kjo
+              platformë nuk përdoret për emergjenca. Telefono menjëherë{' '}
+              <a
+                href="tel:112"
+                className="font-black text-slate-950 underline decoration-2 underline-offset-2"
+              >
+                112
+              </a>
+              , numri unik emergjent pa pagesë në Republikën e Kosovës.
+            </p>
           </aside>
         </div>
       </section>

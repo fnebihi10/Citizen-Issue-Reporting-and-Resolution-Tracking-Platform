@@ -4,11 +4,14 @@ Platformë web për raportimin, ndjekjen dhe zgjidhjen e problemeve qytetare. Pr
 
 Titulli i punimit: **Zhvillimi i një platforme për raportimin, ndjekjen dhe zgjidhjen e problemeve qytetare**
 
+**Aplikacioni live:** [https://raporto-qytetin.vercel.app](https://raporto-qytetin.vercel.app)
+
 ## Gjendja aktuale
 
-Sprintet 1–9 janë të implementuara dhe të verifikuara në nivel aplikacioni,
-databaze dhe cilësie. Sprinti 10 për paketën e release-it dhe tezës është në
-punë:
+Sprintet 1–10 janë implementuar dhe verifikuar në nivel aplikacioni,
+databaze, sigurie dhe deployment-i. Release-i final teknik është aktiv në
+Vercel; videoja 4–6 minuta dhe kredencialet demo dorëzohen si materiale të
+veçanta, jo si secrets në repository.
 
 - arkitekturë, standarde të kodit dhe design system responsive;
 - Supabase me PostgreSQL/PostGIS, migrations, RLS, private Storage dhe views publike të sanitizuara;
@@ -24,7 +27,8 @@ punë:
   privatësi-safe të raportimeve të ngjashme;
 - inbox dhe detaj privat për zyrtarët, workflow atomik i statuseve, caktim
   departamenti/zyrtari, prioritet, komente publike/interne, histori e plotë,
-  njoftime dhe rihapje e kontrolluar nga qytetari;
+  njoftime, provë fotografike të zgjidhjes dhe rihapje e kontrolluar nga
+  qytetari;
 - panel zyrtar responsive me ngarkesën operative, radhën e vëmendjes,
   caktimet personale, afatet fillestare dhe njoftimet e palexuara;
 - panel administrativ responsive me menaxhim rolesh/departamentesh, kategori
@@ -137,6 +141,7 @@ Lexo [udhëzuesin e Supabase](docs/supabase-setup.md) dhe [checklistën e autent
 - [Verifikimi i Sprintit 9](docs/sprint-9-verification.md)
 - [Deploy në Vercel](docs/deployment.md)
 - [Plani i demo-s](docs/demo-plan.md)
+- [Shablloni privat i kredencialeve demo](docs/demo-credentials-template.md)
 - [Verifikimi i Sprintit 10](docs/sprint-10-verification.md)
 - [Plani i testimit](docs/test-plan.md)
 - [Diagramet autoritative](diagrams/README.md)
@@ -144,4 +149,9 @@ Lexo [udhëzuesin e Supabase](docs/supabase-setup.md) dhe [checklistën e autent
 
 ## Kufijtë e projektit
 
-Platforma nuk zëvendëson shërbimet e emergjencës; nuk përdor identitet elektronik shtetëror, pagesa, aplikacion native ose AI për klasifikimin e fotografive. Dataset-i nuk përmban emra, email, fotografi, adresa ose raporte të personave realë.
+Platforma nuk zëvendëson shërbimet e emergjencës. Për rrezik të menjëhershëm
+telefonohet **112**, numri unik emergjent pa pagesë në Republikën e Kosovës
+([Agjencia e Menaxhimit të Emergjencave](https://ame.rks-gov.net/page/al-sq/about-112)).
+Projekti nuk përdor identitet elektronik shtetëror, pagesa, aplikacion native
+ose AI për klasifikimin e fotografive. Dataset-i nuk përmban emra, email,
+fotografi, adresa ose raporte të personave realë.

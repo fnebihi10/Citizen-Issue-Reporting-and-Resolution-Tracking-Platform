@@ -1,14 +1,23 @@
 # Diagramet autoritative
 
-Diagramet Mermaid më poshtë pasqyrojnë migrations dhe kodin real pas Sprintit
-8, duke përfshirë panelet qytetar/zyrtar/admin dhe transparencën publike.
-Skedarët e vjetër PNG/Draw.io
-në këtë dosje ruhen si drafte historike të
-paketës fillestare; ata nuk përdoren si burim i së vërtetës kur devijojnë nga
-ky dokument.
+Diagramet Mermaid më poshtë pasqyrojnë migrations dhe kodin real të release-it
+final, duke përfshirë panelet qytetar/zyrtar/admin, transparencën publike dhe
+rrjedhat e Storage-it privat. Këto janë burimi autoritativ për arkitekturën.
 
-Para dorëzimit final në Sprintin 10, këto diagrame eksportohen në figurat me
-numërim dhe stilin e punimit të FIMK-ut.
+Eksportet SVG të përditësuara janë:
+
+- [`use-case-diagram.svg`](use-case-diagram.svg)
+- [`state-diagram.svg`](state-diagram.svg)
+- [`er-diagram.svg`](er-diagram.svg)
+- [`architecture-diagram.svg`](architecture-diagram.svg)
+- [`admin-export-sequence.svg`](admin-export-sequence.svg)
+- [`public-transparency-sequence.svg`](public-transparency-sequence.svg)
+- [`report-creation-sequence.svg`](report-creation-sequence.svg)
+- [`official-workflow-sequence.svg`](official-workflow-sequence.svg)
+
+PNG/Draw.io-t e paketës së parë, të cilat nuk pasqyrojnë implementimin final,
+janë ruajtur vetëm për histori në [`archive/initial-design`](archive/initial-design/)
+dhe nuk duhet të përdoren në punim ose prezantim.
 
 ## Use-case diagram
 
@@ -98,7 +107,7 @@ erDiagram
     text email
   }
   PROFILES {
-    uuid id PK_FK
+    uuid id PK, FK
     text email
     text full_name
     user_role role

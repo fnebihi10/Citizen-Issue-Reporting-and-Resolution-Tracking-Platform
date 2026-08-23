@@ -46,12 +46,35 @@ async function expectNoA11yViolations(page: Page) {
 }
 
 async function expectNoHorizontalOverflow(page: Page) {
-  const dimensions = await page.evaluate(() => ({
-    clientWidth: document.documentElement.clientWidth,
-    scrollWidth: document.documentElement.scrollWidth,
-  }));
+  const dimensions = await page.evaluate(() => {
+    const clientWidth = document.documentElement.clientWidth;
+    const scrollWidth = document.documentElement.scrollWidth;
+    const offenders = [...document.querySelectorAll<HTMLElement>('body *')]
+      .map((element) => {
+        const rect = element.getBoundingClientRect();
+        return {
+          tag: element.tagName.toLowerCase(),
+          className: element.className,
+          text: (element.textContent ?? '').trim().slice(0, 100),
+          left: Math.round(rect.left),
+          right: Math.round(rect.right),
+          width: Math.round(rect.width),
+        };
+      })
+      .filter(
+        (element) =>
+          element.width > 0
+          && (element.right > clientWidth + 1 || element.left < -1),
+      )
+      .slice(0, 10);
 
-  expect(dimensions.scrollWidth).toBe(dimensions.clientWidth);
+    return { clientWidth, scrollWidth, offenders };
+  });
+
+  expect(
+    dimensions.scrollWidth,
+    `Horizontal overflow elements: ${JSON.stringify(dimensions.offenders)}`,
+  ).toBe(dimensions.clientWidth);
 }
 
 async function auditRoute(page: Page, route: string, privateCache = false) {
@@ -173,5 +196,15 @@ test.describe('synthetic-data quality regression', () => {
     ]) {
       await auditRoute(page, route, true);
     }
+
+    const inProgressReportId = '10000000-0000-4000-8000-000000000024';
+    await auditRoute(
+      page,
+      `/official/reports/${inProgressReportId}`,
+      true,
+    );
+    await expect(
+      page.getByRole('heading', { name: 'Ngarko provën e zgjidhjes' }),
+    ).toBeVisible();
   });
 });

@@ -350,7 +350,14 @@ export default async function CitizenDashboardPage() {
             </span>
             <p className="text-sm leading-6 text-amber-950">
               <strong>Kjo platformë nuk trajton emergjenca.</strong> Për rrezik
-              të menjëhershëm përdor kanalet zyrtare të emergjencës.
+              të menjëhershëm telefono{' '}
+              <a
+                href="tel:112"
+                className="font-black underline decoration-2 underline-offset-2"
+              >
+                112
+              </a>
+              , numri unik emergjent pa pagesë në Republikën e Kosovës.
             </p>
           </div>
         </section>
