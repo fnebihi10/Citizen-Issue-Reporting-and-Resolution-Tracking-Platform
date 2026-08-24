@@ -11,6 +11,7 @@ Supabase Auth dhe smoke test-i i production-it janë verifikuar më 23 gusht 202
 - README, `.env.example`, arkitekturë, skemë databaze dhe security baseline;
 - diagramet autoritative dhe wireframes;
 - raporti i testimit me 80 teste Vitest, 83 assertions pgTAP dhe Playwright;
+- ngarkimi privat i provës fotografike të zgjidhjes, me pastrim EXIF/GPS;
 - metadata canonical/Open Graph, robots, sitemap dhe faqe të personalizuara
   404/global error;
 - udhëzuesi i Vercel/Supabase dhe plani i demo-s;
@@ -47,20 +48,23 @@ Supabase Auth dhe smoke test-i i production-it janë verifikuar më 23 gusht 202
       18/18 dhe nga testimi manual i pronarit mbi të njëjtin release/Supabase.
 - [x] Header-at e sigurisë verifikohen live; redirect-i i route-it privat dhe
       politika `private/no-store` mbulohen nga testet authenticated.
-- [ ] Screenshot-et finale dhe video-demo do të krijohen gjatë dokumentimit të
-      tezës dhe duhet të përdorin vetëm të dhëna sintetike.
+- [x] Screenshot-et finale janë krijuar vetëm me të dhëna sintetike.
+- [x] Video-demo 5:30 është prodhuar si artefakt i veçantë për paketën e
+      mentorit; skenari gjendet në `docs/demo-plan.md` dhe videoja nuk ruan
+      kredenciale.
 
 ## Prova e deployment-it
 
 | Fusha | Vlera |
 |---|---|
 | URL production | `https://raporto-qytetin.vercel.app` |
-| Commit SHA i aplikacionit | `38455ad0a82a65c4b9726353b339a2d525db6501` |
+| Commit SHA i aplikacionit | `e857e992fe5e1d7638011bc784f8d07989ad70e1` |
 | Data | 2026-08-23 |
-| GitHub Actions | PASS — validate dhe database security tests |
+| GitHub Actions | [PASS — validate dhe database security tests](https://github.com/fnebihi10/Citizen-Issue-Reporting-and-Resolution-Tracking-Platform/actions/runs/32660514176) |
 | Smoke test live | PASS — `npm run verify:production -- https://raporto-qytetin.vercel.app`, 16/16 |
 | Metadata | PASS — canonical dhe Open Graph përdorin domain-in final |
 | Auth production | PASS — Supabase Site URL/callback korrekt dhe route privat ridrejton në login |
 | Smoke test me role | PASS — suite authenticated 18/18 + validimi manual i pronarit; kredenciale reale nuk ruhen në repo |
 | Domain-i i vjetër | PASS — ridrejton me 307 te domain-i final |
-| Vendimi final | **GO — Sprint 10 i mbyllur për demo dhe dokumentim të tezës** |
+| Prova e zgjidhjes | PASS — autorizim, validim, pastrim metadata, Storage privat dhe mos-ekspozim publik |
+| Vendimi final | **GO — Sprint 10 i mbyllur teknikisht; videoja mbetet artefakt i dorëzimit** |

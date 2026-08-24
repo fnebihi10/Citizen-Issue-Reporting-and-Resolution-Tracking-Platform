@@ -84,7 +84,9 @@ llogari sintetike qytetari, zyrtari dhe administratori.
 | pgTAP | PASS — 5 skedarë, 83/83 assertions |
 | Supabase DB lint | PASS — pa gjetje në schema `public` |
 
-Playwright-i i autentikuar dhe smoke test-i live regjistrohen në
-[`sprint-10-verification.md`](sprint-10-verification.md) pas ekzekutimit të CI-së
-mbi commit-in e release-it. Studim i jashtëm me 5–10 persona nuk është
-realizuar dhe nuk paraqitet si rezultat.
+Playwright-i publik dhe i autentikuar kaluan në GitHub Actions mbi commit-in
+`e857e992fe5e1d7638011bc784f8d07989ad70e1`; run-i autoritativ është
+[`32660514176`](https://github.com/fnebihi10/Citizen-Issue-Reporting-and-Resolution-Tracking-Platform/actions/runs/32660514176).
+Evidenca e plotë e release-it ruhet në
+[`sprint-10-verification.md`](sprint-10-verification.md). Studim i jashtëm me
+5–10 persona nuk është realizuar dhe nuk paraqitet si rezultat.
